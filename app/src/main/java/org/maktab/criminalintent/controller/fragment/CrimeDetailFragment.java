@@ -228,6 +228,7 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = (mCurrentIndex - 1 + mRepository.repositorySize()) % mRepository.repositorySize();
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
                 initViews();
+
                 /*UUID id = mRepository.pervPosition(mCrime.getId());
                 Intent intent = CrimePagerActivity.newIntent(getActivity(), id);
                 startActivity(intent);*/
@@ -255,10 +256,6 @@ public class CrimeDetailFragment extends Fragment {
                 startActivity(intent);*/
             }
         });
-    }
-
-    private void updateCrimeinFragment() {
-
     }
 
     private void updateCrime() {
