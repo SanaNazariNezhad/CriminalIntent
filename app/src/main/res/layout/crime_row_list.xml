@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/row_item_crime_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/imgview_solved"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        tools:text="crime Title" />
+
+    <TextView
+        android:id="@+id/row_item_cime_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/imgview_solved"
+        android:layout_below="@id/row_item_crime_title"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        tools:text="crime Date" />
+
+    <ImageView
+        android:id="@+id/imgview_solved"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="4dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_launcher_foreground" />
+</RelativeLayout>
