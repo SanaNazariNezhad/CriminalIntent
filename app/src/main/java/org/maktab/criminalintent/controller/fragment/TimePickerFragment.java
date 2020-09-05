@@ -5,15 +5,19 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TimePicker;
 
 import org.maktab.criminalintent.R;
@@ -31,9 +35,9 @@ public class TimePickerFragment extends DialogFragment {
     public static final String ARGS_CRIME_TIME = "crimeTime";
     public static final String EXTRA_USER_SELECTED_TIME = "com.example.criminalintent.userSelectedTime";
     private Date mCrimeDate;
-    private int mSecond;
 
     private TimePicker mTimePicker;
+    /*private Button mButtonOk,mButtonCancel;*/
     private Calendar mCalendar;
 
     public TimePickerFragment() {
@@ -83,6 +87,8 @@ public class TimePickerFragment extends DialogFragment {
 
     private void findViews(View view) {
         mTimePicker = view.findViewById(R.id.time_picker_crime);
+        /*mButtonOk = view.findViewById(R.id.btn_ok);
+        mButtonCancel = view.findViewById(R.id.btn_cancel);*/
     }
 
     private void initViews() {
