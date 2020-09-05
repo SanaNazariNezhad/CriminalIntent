@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimeRepository implements IRepository{
+public class CrimeRepository implements IRepository {
 
     private static final int CRIME_SIZE = 100;
     private static CrimeRepository sInstance;
@@ -21,13 +21,13 @@ public class CrimeRepository implements IRepository{
     }
 
 
-    private CrimeRepository(){
+    private CrimeRepository() {
         mCrimes = new ArrayList<>();
 
-        for (int i = 0; i <CRIME_SIZE ; i++) {
+        for (int i = 0; i < CRIME_SIZE; i++) {
             Crime crime = new Crime();
-            crime.setTitle("Crime#" + (i+1));
-            crime.setSolved((i%2 == 0));
+            crime.setTitle("Crime#" + (i + 1));
+            crime.setSolved((i % 2 == 0));
 
             mCrimes.add(crime);
         }
@@ -43,21 +43,22 @@ public class CrimeRepository implements IRepository{
         mCrimes = crimes;
     }
 
-    public Crime getCrime(UUID id){
-        for (Crime crime: mCrimes)
+    public Crime getCrime(UUID id) {
+        for (Crime crime : mCrimes) {
             if (crime.getId().equals(id))
                 return crime;
-            return null;
+        }
+        return null;
     }
 
     @Override
-    public int repositorySize(){
+    public int repositorySize() {
         return CRIME_SIZE;
     }
 
     @Override
-    public int getIndexOfCrime (Crime crime){
-        for (int i = 0; i <CRIME_SIZE ; i++) {
+    public int getIndexOfCrime(Crime crime) {
+        for (int i = 0; i < CRIME_SIZE; i++) {
             if (mCrimes.get(i).equals(crime))
                 return i;
         }
@@ -65,11 +66,11 @@ public class CrimeRepository implements IRepository{
     }
 
     @Override
-    public Crime getCrimeWithIndex (int index){
+    public Crime getCrimeWithIndex(int index) {
         return mCrimes.get(index);
     }
 
-    public void insertCrime(Crime crime){
+    public void insertCrime(Crime crime) {
         mCrimes.add(crime);
     }
 
@@ -103,19 +104,20 @@ public class CrimeRepository implements IRepository{
     }
 
     @Override
-    public UUID nextPosition(UUID crimeId){
+    public UUID nextPosition(UUID crimeId) {
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId))
-                return mCrimes.get(i+1).getId();
+                return mCrimes.get(i + 1).getId();
         }
 
         return null;
     }
+
     @Override
-    public UUID pervPosition(UUID crimeId){
+    public UUID pervPosition(UUID crimeId) {
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId))
-                return mCrimes.get(i-1).getId();
+                return mCrimes.get(i - 1).getId();
         }
 
         return null;

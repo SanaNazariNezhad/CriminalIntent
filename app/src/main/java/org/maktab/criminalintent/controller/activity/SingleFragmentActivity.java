@@ -24,7 +24,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
         //create an add fragment transaction for CrimeDetailFragment
         if (fragment == null) {
-            CrimeDetailFragment crimeDetailFragment = new CrimeDetailFragment();
             fragmentManager
                     .beginTransaction()
                     .add(R.id.fragment_container, createFragment())

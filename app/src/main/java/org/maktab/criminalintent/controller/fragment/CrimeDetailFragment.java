@@ -1,5 +1,6 @@
 package org.maktab.criminalintent.controller.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,22 +28,26 @@ import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class CrimeDetailFragment extends Fragment {
 
     public static final String ARGUMENT_CRIME_ID = "crimeId";
-
+    public static final String FRAGMENT_TAG_DATE_PICKER = "DatePicker";
+    public static final int REQUEST_CODE_DATE_PICKER = 0;
     public static final String TAG = "CDF";
+
     private EditText mEditTextTitle;
     private Button mButtonDate;
     private CheckBox mCheckBoxSolved;
     private IRepository mRepository;
+    private Crime mCrime;
+
     private ImageView mImageViewNext,mImageViewPerv,mImageViewFirst,mImageViewLast;
     private int mCurrentIndex;
 
-    //dummy object just for testing
-    private Crime mCrime;
+
 
     public static CrimeDetailFragment newInstance(UUID crimeId) {
 
@@ -156,6 +161,19 @@ public class CrimeDetailFragment extends Fragment {
         Log.d(TAG, "onDetach");
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != Activity.RESULT_OK || data == null)
+            return;
+
+        if (requestCode == REQUEST_CODE_DATE_PICKER) {
+            Date userSelectedDate =
+                    (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
+
+            updateCrimeDate(userSelectedDate);
+        }
+    }
+
     private void findViews(View view) {
         mEditTextTitle = view.findViewById(R.id.crime_title);
         mButtonDate = view.findViewById(R.id.crime_date);
@@ -170,7 +188,6 @@ public class CrimeDetailFragment extends Fragment {
         mEditTextTitle.setText(mCrime.getTitle());
         mCheckBoxSolved.setChecked(mCrime.isSolved());
         mButtonDate.setText(mCrime.getDate().toString());
-        mButtonDate.setEnabled(false);
     }
 
     private void setListeners() {
@@ -204,7 +221,17 @@ public class CrimeDetailFragment extends Fragment {
         mButtonDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DatePickerFragment datePickerFragment =
+                        DatePickerFragment.newInstance(mCrime.getDate());
 
+                //create parent-child relations between CDF and DPF
+                datePickerFragment.setTargetFragment(
+                        CrimeDetailFragment.this,
+                        REQUEST_CODE_DATE_PICKER);
+
+                datePickerFragment.show(
+                        getActivity().getSupportFragmentManager(),
+                        FRAGMENT_TAG_DATE_PICKER);
             }
         });
 
@@ -260,6 +287,12 @@ public class CrimeDetailFragment extends Fragment {
 
     private void updateCrime() {
         mRepository.updateCrime(mCrime);
+    }
+    private void updateCrimeDate(Date userSelectedDate) {
+        mCrime.setDate(userSelectedDate);
+        updateCrime();
+
+        mButtonDate.setText(mCrime.getDate().toString());
     }
 
 }
