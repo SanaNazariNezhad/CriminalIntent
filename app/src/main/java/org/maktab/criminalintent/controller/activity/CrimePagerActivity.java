@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -122,6 +124,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         public CrimePagerAdapter(@NonNull FragmentActivity fragmentActivity, List<Crime> crimes) {
             super(fragmentActivity);
             mCrimes = crimes;
+
         }
 
         @NonNull
@@ -141,4 +144,5 @@ public class CrimePagerActivity extends AppCompatActivity {
             return mCrimes.size();
         }
     }
+
 }
