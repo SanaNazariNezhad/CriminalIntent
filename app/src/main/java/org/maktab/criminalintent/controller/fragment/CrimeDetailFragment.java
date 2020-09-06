@@ -185,10 +185,10 @@ public class CrimeDetailFragment extends Fragment {
             return;
 
         if (requestCode == REQUEST_CODE_DATE_PICKER) {
-            Date userSelectedDate =
-                    (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
+            Calendar userSelectedDate =
+                    (Calendar) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
 
-            updateCrimeDate(userSelectedDate);
+            updateCrimeDate(userSelectedDate.getTime());
         } else if (requestCode == REQUEST_CODE_TIME_PICKER) {
             Calendar userSelectedTime =
                     (Calendar) data.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);

@@ -122,8 +122,8 @@ public class TimePickerFragment extends DialogFragment {
 
     private void findViews(View view) {
         mTimePicker = view.findViewById(R.id.time_picker_crime);
-        mButtonOk = view.findViewById(R.id.btn_ok);
-        mButtonCancel = view.findViewById(R.id.btn_cancel);
+        mButtonOk = view.findViewById(R.id.btn_ok_time);
+        mButtonCancel = view.findViewById(R.id.btn_cancel_time);
     }
 
     private void initViews() {
