@@ -149,7 +149,7 @@ public class TimePickerFragment extends DialogFragment {
         int minute = mTimePicker.getMinute();
         int second = now.getSecond();
 
-        mCalendar.set(Calendar.HOUR, hour);
+        mCalendar.set(Calendar.HOUR_OF_DAY, hour);
         mCalendar.set(Calendar.MINUTE, minute);
         mCalendar.set(Calendar.SECOND, second);
     }
