@@ -17,4 +17,6 @@ public interface IRepository {
     int getIndexOfCrime (Crime crime);
     Crime getCrimeWithIndex (int index);
     int repositorySize();
+    public void setCrimesSelected();
+    public void setCrimesUnSelected();
 }

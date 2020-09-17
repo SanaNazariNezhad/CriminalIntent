@@ -7,23 +7,29 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <CheckBox
+        android:id="@+id/row_item_crime_checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/row_item_crime_title"
+        android:layout_alignParentStart="true"/>
     <TextView
         android:id="@+id/row_item_crime_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:layout_alignParentLeft="true"
+        android:layout_toRightOf="@id/row_item_crime_checkBox"
         android:layout_toLeftOf="@id/imgview_solved"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         tools:text="crime Title" />
 
     <TextView
-        android:id="@+id/row_item_cime_date"
+        android:id="@+id/row_item_crime_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:layout_alignParentLeft="true"
+        android:layout_toRightOf="@id/row_item_crime_checkBox"
         android:layout_toLeftOf="@id/imgview_solved"
         android:layout_below="@id/row_item_crime_title"
         android:textColor="@android:color/black"
@@ -35,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/row_item_crime_title"
-        android:layout_alignBottom="@id/row_item_cime_date"
+        android:layout_alignBottom="@id/row_item_crime_date"
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_handcuffs" />
 </RelativeLayout>

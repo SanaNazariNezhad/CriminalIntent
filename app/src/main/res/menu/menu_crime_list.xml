@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_item_add_crime"
+        android:icon="@drawable/ic_plus"
+        android:title="@string/menu_add_crime"
+        app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_item_remove_crime"
+        android:icon="@drawable/ic_delete_forever"
+        android:title="@string/menu_delete_crime"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/menu_item_selectAll_crime"
+        android:icon="@drawable/ic_check_box"
+        android:title="@string/menu_selectAll_crime"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/menu_item_unSelectAll_crime"
+        android:icon="@drawable/ic_check_box_outline_blank"
+        android:title="@string/menu_unSelectAll_crime"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/menu_item_subtitle"
+        android:title="@string/menu_item_show_subtitle"
+        app:showAsAction="ifRoom|withText" />
+
+</menu>

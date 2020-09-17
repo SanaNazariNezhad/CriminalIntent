@@ -13,6 +13,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,8 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.activity.CrimeDetailActivity;
-import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
+import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
@@ -54,6 +56,7 @@ public class CrimeDetailFragment extends Fragment {
 
     private String mDate, mTime;
     private boolean flag = false;
+    private boolean mFlagRemove = false;
 
     private ImageView mImageViewNext, mImageViewPerv, mImageViewFirst, mImageViewLast;
     private int mCurrentIndex;
@@ -96,6 +99,7 @@ public class CrimeDetailFragment extends Fragment {
 
         UUID crimeId = (UUID) getArguments().getSerializable(ARGUMENT_CRIME_ID);
         mCrime = mRepository.getCrime(crimeId);
+        setHasOptionsMenu(true);
 
     }
 
@@ -126,6 +130,27 @@ public class CrimeDetailFragment extends Fragment {
         setListeners();
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_crime_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_crime:
+                CrimeRepository.getInstance().deleteCrime(mCrime);
+                mFlagRemove = true;
+
+                Intent intent = CrimeListActivity.newIntent(getActivity());
+                startActivity(intent);
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -302,7 +327,9 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     private void updateCrime() {
-        mRepository.updateCrime(mCrime);
+        if (!mFlagRemove) {
+            mRepository.updateCrime(mCrime);
+        }
     }
 
     private void updateCrimeDate(Date userSelectedDate) {

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class CrimeRepository implements IRepository {
 
-    private static final int CRIME_SIZE = 100;
+    private static final int CRIME_SIZE = 5;
     private static CrimeRepository sInstance;
 
     private List<Crime> mCrimes;
@@ -49,6 +49,20 @@ public class CrimeRepository implements IRepository {
                 return crime;
         }
         return null;
+    }
+
+    @Override
+    public void setCrimesSelected(){
+        for (Crime crime : mCrimes) {
+            crime.setCheck_Select(true);
+        }
+    }
+
+    @Override
+    public void setCrimesUnSelected(){
+        for (Crime crime : mCrimes) {
+            crime.setCheck_Select(false);
+        }
     }
 
     @Override

@@ -4,25 +4,32 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.activity.CrimeDetailActivity;
 import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public class CrimeListFragment extends Fragment {
 
@@ -31,8 +38,13 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     private IRepository mRepository;
+    private List<Crime> mCrimes;
     private CrimeAdapter mCrimeAdapter;
     private int mPosition;
+    private boolean isSubtitleVisible = false;
+    private LinearLayout mLinearLayoutEmpty;
+    private LinearLayout mLinearLayoutRecycler;
+    private Button mButtonNewCrime;
 
     public static CrimeListFragment newInstance() {
 
@@ -52,6 +64,7 @@ public class CrimeListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mRepository = CrimeRepository.getInstance();
+        setHasOptionsMenu(true);
 
     }
 
@@ -63,8 +76,77 @@ public class CrimeListFragment extends Fragment {
 
         findViews(view);
         initViews();
-
+        listeners();
         return view;
+    }
+
+    private void listeners() {
+        mButtonNewCrime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Crime crime = new Crime();
+                CrimeRepository.getInstance().insertCrime(crime);
+
+                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_crime_list, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_add_crime:
+                Crime crime = new Crime();
+                CrimeRepository.getInstance().insertCrime(crime);
+
+                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);
+
+                return true;
+            case R.id.menu_item_subtitle:
+                isSubtitleVisible = !isSubtitleVisible;
+                updateSubtitle();
+
+                item.setTitle(
+                        isSubtitleVisible ?
+                                R.string.menu_item_hide_subtitle :
+                                R.string.menu_item_show_subtitle);
+                return true;
+            case R.id.menu_item_remove_crime:
+                for (int i = 0; i <mCrimes.size() ; i++) {
+                    if (mCrimes.get(i).isCheck_Select()) {
+                        mRepository.deleteCrime(mCrimes.get(i));
+                        i-=1;
+                    }
+                }
+                updateUI();
+                return true;
+            case R.id.menu_item_selectAll_crime:
+                mRepository.setCrimesSelected();
+                updateUI();
+                return true;
+            case R.id.menu_item_unSelectAll_crime:
+                mRepository.setCrimesUnSelected();
+                updateUI();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateSubtitle() {
+        int numberOfCrimes = CrimeRepository.getInstance().getCrimes().size();
+        String crimesText = isSubtitleVisible ? numberOfCrimes + " crimes" : null;
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(crimesText);
     }
 
     @Override
@@ -72,6 +154,7 @@ public class CrimeListFragment extends Fragment {
         super.onResume();
 
         updateUI();
+        updateSubtitle();
     }
 
     private void initViews() {
@@ -81,19 +164,31 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<Crime> crimes = mRepository.getCrimes();
-
-        if (mCrimeAdapter == null) {
-           mCrimeAdapter = new CrimeAdapter(crimes);
-           mRecyclerView.setAdapter(mCrimeAdapter);
-        }else {
-            mCrimeAdapter.notifyItemChanged(mPosition);
-            /*mCrimeAdapter.notifyDataSetChanged();*/
+        mCrimes = mRepository.getCrimes();
+        if (mCrimes.size() != 0){
+            mLinearLayoutEmpty.setVisibility(View.GONE);
+            mLinearLayoutRecycler.setVisibility(View.VISIBLE);
+            if (mCrimeAdapter == null) {
+                mCrimeAdapter = new CrimeAdapter(mCrimes);
+                mRecyclerView.setAdapter(mCrimeAdapter);
+            }else {
+//                mCrimeAdapter.notifyItemChanged(mPosition);
+                mCrimeAdapter.notifyDataSetChanged();
+            }
         }
+        else {
+            mLinearLayoutEmpty.setVisibility(View.VISIBLE);
+            mLinearLayoutRecycler.setVisibility(View.GONE);
+
+        }
+
     }
 
     private void findViews(View view) {
         mRecyclerView = view.findViewById(R.id.recycler_view_crime_list);
+        mLinearLayoutEmpty = view.findViewById(R.id.empty_layout);
+        mLinearLayoutRecycler = view.findViewById(R.id.recycler_layout);
+        mButtonNewCrime = view.findViewById(R.id.btn_newCrime);
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder {
@@ -102,26 +197,36 @@ public class CrimeListFragment extends Fragment {
         private TextView mTextViewDate;
         private Crime mCrime;
         private ImageView mImageViewSolved;
+        private CheckBox mCheckBoxSelect;
 
 
         public CrimeHolder(@NonNull View itemView) {
             super(itemView);
 
             mTextViewTitle = itemView.findViewById(R.id.row_item_crime_title);
-            mTextViewDate = itemView.findViewById(R.id.row_item_cime_date);
+            mTextViewDate = itemView.findViewById(R.id.row_item_crime_date);
             mImageViewSolved = itemView.findViewById(R.id.imgview_solved);
+            mCheckBoxSelect = itemView.findViewById(R.id.row_item_crime_checkBox);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 //                    Intent intent = CrimeDetailActivity.newIntent(getActivity(),mCrime.getId());
                     Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-                    startActivity(intent);
+                    startActivityForResult(intent,0);
 
                     /*Intent intent = new Intent(getActivity(), CrimeDetailActivity.class);
                     intent.putExtra(EXTRA_CRIME_ID,mCrime.getId());*/
 
 //                    Toast.makeText(getActivity(),mCrime.getTitle() + " is Clicked",Toast.LENGTH_SHORT).show();
+                }
+            });
+            mCheckBoxSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Crime crime = mRepository.getCrime(mCrime.getId());
+                    crime.setCheck_Select(isChecked);
+                    mRepository.updateCrime(crime);
                 }
             });
         }
@@ -131,6 +236,7 @@ public class CrimeListFragment extends Fragment {
             mTextViewTitle.setText(crime.getTitle());
             mTextViewDate.setText(crime.getDate().toString());
             mImageViewSolved.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
+            mCheckBoxSelect.setChecked(crime.isCheck_Select());
 
 
         }
@@ -174,6 +280,7 @@ public class CrimeListFragment extends Fragment {
             Crime crime = mCrimes.get(position);
 
             holder.bindCrime(crime);
+
         }
 
     }
