@@ -20,19 +20,23 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.controller.activity.SignUpActivity;
+import org.maktab.criminalintent.model.User;
+import org.maktab.criminalintent.repository.IUserRepository;
+import org.maktab.criminalintent.repository.UserDBRepository;
 
 public class LoginFragment extends Fragment {
     public static final String BUNDLE_KEY_USERNAME = "UserBundle";
     public static final String BUNDLE_KEY_PASSWORD = "passBundle";
     private Button mButtonLogin, mButtonSignUp;
     public static final int REQUEST_CODE_SIGN_UP = 0;
-    private String user, pass;
+    private String username, password;
     private ViewGroup mViewGroupRootLayout;
 
     private TextInputLayout mUsernameForm;
     private TextInputLayout mPasswordForm;
     private TextInputEditText mUsername;
     private TextInputEditText mPassword;
+    private IUserRepository mUserRepository;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -53,9 +57,11 @@ public class LoginFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mUserRepository = UserDBRepository.getInstance(getActivity());
+
         if (savedInstanceState != null) {
-            user = savedInstanceState.getString(BUNDLE_KEY_USERNAME);
-            pass = savedInstanceState.getString(BUNDLE_KEY_PASSWORD);
+            username = savedInstanceState.getString(BUNDLE_KEY_USERNAME);
+            password = savedInstanceState.getString(BUNDLE_KEY_PASSWORD);
         }
     }
 
@@ -72,8 +78,8 @@ public class LoginFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(BUNDLE_KEY_USERNAME, user);
-        outState.putString(BUNDLE_KEY_PASSWORD, pass);
+        outState.putString(BUNDLE_KEY_USERNAME, username);
+        outState.putString(BUNDLE_KEY_PASSWORD, password);
     }
 
     @Override
@@ -83,10 +89,10 @@ public class LoginFragment extends Fragment {
         if (resultCode != Activity.RESULT_OK || data == null)
             return;
         if (requestCode == REQUEST_CODE_SIGN_UP) {
-            user = data.getStringExtra(SignUpFragment.EXTRA_USERNAME_SIGN_UP);
-            pass = data.getStringExtra(SignUpFragment.EXTRA_PASSWORD_SIGN_UP);
-            mUsername.setText(user);
-            mPassword.setText(pass);
+            username = data.getStringExtra(SignUpFragment.EXTRA_USERNAME_SIGN_UP);
+            password = data.getStringExtra(SignUpFragment.EXTRA_PASSWORD_SIGN_UP);
+            mUsername.setText(username);
+            mPassword.setText(password);
         }
     }
 
@@ -116,6 +122,9 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean validateInput() {
+        User user = mUserRepository.getUser(mUsername.getText().toString());
+        String inputUsername = user.getUsername();
+        String inputPassword = user.getPassword();
         if (mUsername.getText().toString().trim().isEmpty() && mPassword.getText().toString().trim().isEmpty()) {
             mUsernameForm.setErrorEnabled(true);
             mUsernameForm.setError("Field cannot be empty!");
@@ -130,8 +139,8 @@ public class LoginFragment extends Fragment {
             mPasswordForm.setErrorEnabled(true);
             mPasswordForm.setError("Field cannot be empty!");
             return false;
-        } else if (!mUsername.getText().toString().equals(user) ||
-                !mPassword.getText().toString().equals(pass)) {
+        } else if (!mUsername.getText().toString().equals(inputUsername) ||
+                !mPassword.getText().toString().equals(inputPassword)) {
             callToast(R.string.toast_login);
             return false;
         }

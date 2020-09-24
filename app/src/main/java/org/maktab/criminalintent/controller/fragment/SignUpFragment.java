@@ -14,6 +14,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.maktab.criminalintent.R;
+import org.maktab.criminalintent.model.User;
+import org.maktab.criminalintent.repository.IUserRepository;
+import org.maktab.criminalintent.repository.UserDBRepository;
 
 public class SignUpFragment extends Fragment {
 
@@ -24,6 +27,7 @@ public class SignUpFragment extends Fragment {
     private TextInputLayout mPasswordForm;
     private TextInputEditText mUsername;
     private TextInputEditText mPassword;
+    private IUserRepository mUserRepository;
 
     private static final String ARG_USERNAME = "username";
     private static final String ARG_PASSWORD = "password";
@@ -50,6 +54,7 @@ public class SignUpFragment extends Fragment {
 
         mUser = getArguments().getString(ARG_USERNAME);
         mPass = getArguments().getString(ARG_PASSWORD);
+        mUserRepository = UserDBRepository.getInstance(getActivity());
 
     }
 
@@ -83,6 +88,10 @@ public class SignUpFragment extends Fragment {
     }
 
     private void setUserPassResult() {
+        String username = mUsername.getText().toString();
+        String password = mPassword.getText().toString();
+        User user = new User(username,password);
+        mUserRepository.insertUser(user);
         Intent intent = new Intent();
         intent.putExtra(EXTRA_USERNAME_SIGN_UP, mUsername.getText().toString());
         intent.putExtra(EXTRA_PASSWORD_SIGN_UP, mPassword.getText().toString());
