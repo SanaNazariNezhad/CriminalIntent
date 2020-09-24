@@ -33,6 +33,7 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     public static final String TAG = "CLF";
+    private static final String ARG_Username = "username";
     public static final String BUNDLE_ARG_IS_SUBTITLE_VISIBLE = "isSubtitleVisible";
 
     private RecyclerView mRecyclerView;
@@ -45,11 +46,11 @@ public class CrimeListFragment extends Fragment {
     private LinearLayout mLinearLayoutEmpty;
     private LinearLayout mLinearLayoutRecycler;
     private Button mButtonNewCrime;
+    private String mUsername = "Hi";
 
     public static CrimeListFragment newInstance() {
 
         Bundle args = new Bundle();
-
         CrimeListFragment fragment = new CrimeListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -116,12 +117,12 @@ public class CrimeListFragment extends Fragment {
                 startActivity(intent);
 
                 return true;
-            case R.id.menu_item_subtitle:
+            /*case R.id.menu_item_subtitle:
                 mIsSubtitleVisible = !mIsSubtitleVisible;
                 updateSubtitle();
                 setMenuItemSubtitle(item);
 
-                return true;
+                return true;*/
             case R.id.menu_item_remove_crime:
                 for (int i = 0; i <mCrimes.size() ; i++) {
                     if (mCrimes.get(i).isCheck_Select()) {
@@ -159,8 +160,8 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateSubtitle() {
-        int numberOfCrimes = mRepository.getCrimes().size();
-        String crimesText = mIsSubtitleVisible ? numberOfCrimes + " crimes" : null;
+//        int numberOfCrimes = mRepository.getCrimes().size();
+        String crimesText = mUsername;
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.getSupportActionBar().setSubtitle(crimesText);

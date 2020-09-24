@@ -9,6 +9,9 @@ import org.maktab.criminalintent.controller.fragment.CrimeListFragment;
 
 public class CrimeListActivity extends SingleFragmentActivity {
 
+    public static final String EXTRA_USERNAME = "org.maktab.criminalintent.controller.activity.extra_username";
+    private static String mUsername;
+
     public static Intent newIntent(Context context) {
         Intent intent = new Intent(context, CrimeListActivity.class);
         return intent;
@@ -16,7 +19,8 @@ public class CrimeListActivity extends SingleFragmentActivity {
 
     @Override
     public Fragment createFragment() {
-        return new CrimeListFragment();
+        CrimeListFragment crimeListFragment = CrimeListFragment.newInstance();
+        return crimeListFragment;
     }
 
 }
