@@ -28,7 +28,6 @@ import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
-import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
 
 import java.text.DateFormat;
@@ -40,6 +39,7 @@ import java.util.UUID;
 public class CrimeDetailFragment extends Fragment {
 
     public static final String ARGUMENT_CRIME_ID = "crimeId";
+    public static final String ARGUMENT_USERNAME = "username";
     public static final String FRAGMENT_TAG_DATE_PICKER = "DatePicker";
     public static final String FRAGMENT_TAG_TIME_PICKER = "TimePicker";
     public static final int REQUEST_CODE_DATE_PICKER = 0;
@@ -54,7 +54,7 @@ public class CrimeDetailFragment extends Fragment {
     private CheckBox mCheckBoxSolved;
     private IRepository mRepository;
     private Crime mCrime;
-
+    private String mUsername;
     private String mDate, mTime;
     private boolean flag = false;
     private boolean mFlagRemove = false;
@@ -63,12 +63,11 @@ public class CrimeDetailFragment extends Fragment {
     private int mCurrentIndex;
 
 
-    public static CrimeDetailFragment newInstance(UUID crimeId) {
+    public static CrimeDetailFragment newInstance(UUID crimeId,String username) {
 
         Bundle args = new Bundle();
-
         args.putSerializable(ARGUMENT_CRIME_ID, crimeId);
-
+        args.putString(ARGUMENT_USERNAME,username);
         CrimeDetailFragment fragment = new CrimeDetailFragment();
         fragment.setArguments(args);
         return fragment;
@@ -81,7 +80,6 @@ public class CrimeDetailFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         Log.d(TAG, "onAttach");
     }
 
@@ -95,10 +93,9 @@ public class CrimeDetailFragment extends Fragment {
         }
 
         Log.d(TAG, "onCreate");
-
         mRepository = CrimeDBRepository.getInstance(getActivity());
-
         UUID crimeId = (UUID) getArguments().getSerializable(ARGUMENT_CRIME_ID);
+        mUsername = getArguments().getString(ARGUMENT_USERNAME);
         mCrime = mRepository.getCrime(crimeId);
         setHasOptionsMenu(true);
 
@@ -144,11 +141,10 @@ public class CrimeDetailFragment extends Fragment {
             case R.id.menu_item_delete_crime:
                 mRepository.deleteCrime(mCrime);
                 mFlagRemove = true;
-
-                Intent intent = CrimeListActivity.newIntent(getActivity());
+                Intent intent = CrimeListActivity.newIntent(getActivity(),mUsername);
                 startActivity(intent);
-
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -167,11 +163,9 @@ public class CrimeDetailFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode != Activity.RESULT_OK || data == null)
             return;
-
         if (requestCode == REQUEST_CODE_DATE_PICKER) {
             Calendar userSelectedDate =
                     (Calendar) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
-
             updateCrimeDate(userSelectedDate.getTime());
         } else if (requestCode == REQUEST_CODE_TIME_PICKER) {
             Calendar userSelectedTime =
@@ -183,7 +177,6 @@ public class CrimeDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putString(BUNDLE_KEY_DATE, mButtonDate.getText().toString());
         outState.putString(BUNDLE_KEY_TIME, mButtonTime.getText().toString());
     }
@@ -202,7 +195,6 @@ public class CrimeDetailFragment extends Fragment {
     private void initViews() {
         mEditTextTitle.setText(mCrime.getTitle());
         mCheckBoxSolved.setChecked(mCrime.isSolved());
-
         if (!flag) {
             DateFormat dateFormat = getDateFormat();
             mButtonDate.setText(dateFormat.format(mCrime.getDate()));
@@ -229,7 +221,6 @@ public class CrimeDetailFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d(TAG, "onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
-
                 mCrime.setTitle(s.toString());
             }
 
@@ -336,7 +327,6 @@ public class CrimeDetailFragment extends Fragment {
     private void updateCrimeDate(Date userSelectedDate) {
         mCrime.setDate(userSelectedDate);
         updateCrime();
-
         DateFormat dateFormat = getDateFormat();
         mButtonDate.setText(dateFormat.format(mCrime.getDate()));
 
@@ -345,7 +335,6 @@ public class CrimeDetailFragment extends Fragment {
     private void updateCrimeTime(Date userSelectedTime) {
         mCrime.setDate(userSelectedTime);
         updateCrime();
-
         DateFormat timeFormat = getTimeFormat();
         mButtonTime.setText(timeFormat.format(mCrime.getDate()));
     }

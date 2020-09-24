@@ -24,23 +24,19 @@ import org.maktab.criminalintent.model.User;
 import org.maktab.criminalintent.repository.IUserRepository;
 import org.maktab.criminalintent.repository.UserDBRepository;
 
+import java.util.Objects;
+
 public class LoginFragment extends Fragment {
     public static final String BUNDLE_KEY_USERNAME = "UserBundle";
     public static final String BUNDLE_KEY_PASSWORD = "passBundle";
     private Button mButtonLogin, mButtonSignUp;
     public static final int REQUEST_CODE_SIGN_UP = 0;
     private String username, password;
-    private ViewGroup mViewGroupRootLayout;
-
     private TextInputLayout mUsernameForm;
     private TextInputLayout mPasswordForm;
     private TextInputEditText mUsername;
     private TextInputEditText mPassword;
-    private IUserRepository mUserRepository;
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
+    private UserDBRepository mUserRepository;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -56,9 +52,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mUserRepository = UserDBRepository.getInstance(getActivity());
-
         if (savedInstanceState != null) {
             username = savedInstanceState.getString(BUNDLE_KEY_USERNAME);
             password = savedInstanceState.getString(BUNDLE_KEY_PASSWORD);
@@ -103,18 +97,16 @@ public class LoginFragment extends Fragment {
                 mUsernameForm.setErrorEnabled(false);
                 mPasswordForm.setErrorEnabled(false);
                 if (validateInput()) {
-                    Intent intent = CrimeListActivity.newIntent(getActivity());
+                    Intent intent = CrimeListActivity.newIntent(getActivity(),mUsername.getText().toString());
                     startActivity(intent);
                 }
-
-
             }
         });
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = SignUpActivity.newIntent(getActivity(), mUsername.getText().toString(), mPassword.getText().toString());
-                startActivityForResult(intent,REQUEST_CODE_SIGN_UP);
+                startActivityForResult(intent, REQUEST_CODE_SIGN_UP);
 
             }
         });
@@ -122,9 +114,7 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean validateInput() {
-        User user = mUserRepository.getUser(mUsername.getText().toString());
-        String inputUsername = user.getUsername();
-        String inputPassword = user.getPassword();
+        User user = mUserRepository.getUser(Objects.requireNonNull(mUsername.getText()).toString());
         if (mUsername.getText().toString().trim().isEmpty() && mPassword.getText().toString().trim().isEmpty()) {
             mUsernameForm.setErrorEnabled(true);
             mUsernameForm.setError("Field cannot be empty!");
@@ -139,10 +129,18 @@ public class LoginFragment extends Fragment {
             mPasswordForm.setErrorEnabled(true);
             mPasswordForm.setError("Field cannot be empty!");
             return false;
-        } else if (!mUsername.getText().toString().equals(inputUsername) ||
-                !mPassword.getText().toString().equals(inputPassword)) {
+        }
+        if (user == null){
             callToast(R.string.toast_login);
             return false;
+        }else {
+            String inputUsername = user.getUsername();
+            String inputPassword = user.getPassword();
+            if (!mUsername.getText().toString().equals(inputUsername) ||
+                    !mPassword.getText().toString().equals(inputPassword)) {
+                callToast(R.string.toast_login);
+                return false;
+            }
         }
         mUsernameForm.setErrorEnabled(false);
         mPasswordForm.setErrorEnabled(false);
@@ -156,8 +154,6 @@ public class LoginFragment extends Fragment {
         mPasswordForm = view.findViewById(R.id.password_form_login);
         mUsername = view.findViewById(R.id.username_login);
         mPassword = view.findViewById(R.id.password_login);
-        mViewGroupRootLayout = view.findViewById(R.id.rootLayout);
-
     }
 
     private void callToast(int stringId) {

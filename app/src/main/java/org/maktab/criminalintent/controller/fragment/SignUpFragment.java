@@ -18,6 +18,8 @@ import org.maktab.criminalintent.model.User;
 import org.maktab.criminalintent.repository.IUserRepository;
 import org.maktab.criminalintent.repository.UserDBRepository;
 
+import java.util.Objects;
+
 public class SignUpFragment extends Fragment {
 
     public static final String EXTRA_USERNAME_SIGN_UP = "extraUsername";
@@ -27,7 +29,7 @@ public class SignUpFragment extends Fragment {
     private TextInputLayout mPasswordForm;
     private TextInputEditText mUsername;
     private TextInputEditText mPassword;
-    private IUserRepository mUserRepository;
+    private UserDBRepository mUserRepository;
 
     private static final String ARG_USERNAME = "username";
     private static final String ARG_PASSWORD = "password";
@@ -88,8 +90,8 @@ public class SignUpFragment extends Fragment {
     }
 
     private void setUserPassResult() {
-        String username = mUsername.getText().toString();
-        String password = mPassword.getText().toString();
+        String username = Objects.requireNonNull(mUsername.getText()).toString();
+        String password = Objects.requireNonNull(mPassword.getText()).toString();
         User user = new User(username,password);
         mUserRepository.insertUser(user);
         Intent intent = new Intent();

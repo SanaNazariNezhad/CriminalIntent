@@ -3,26 +3,19 @@ package org.maktab.criminalintent.controller.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
-import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -30,16 +23,16 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     public static final String EXTRA_CRIME_ID = "com.example.criminalintent.crimeId";
     public static final String TAG = "CPA";
+    private static final String EXTRA_Username = "username";
     private IRepository mRepository;
-//    private int mPosition;
     private UUID mCrimeId;
-
+    private String mUsername;
     private ViewPager2 mViewPagerCrimes;
 
-    public static Intent newIntent(Context context, UUID crimeId) {
+    public static Intent newIntent(Context context, UUID crimeId,String username) {
         Intent intent = new Intent(context, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, crimeId);
-
+        intent.putExtra(EXTRA_Username,username);
         return intent;
     }
 
@@ -47,10 +40,9 @@ public class CrimePagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_pager);
-
         mRepository = CrimeDBRepository.getInstance(this);
         mCrimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
-
+        mUsername = getIntent().getStringExtra(EXTRA_Username);
         findViews();
         initViews();
 
@@ -64,7 +56,6 @@ public class CrimePagerActivity extends AppCompatActivity {
         List<Crime> crimes = mRepository.getCrimes();
         CrimePagerAdapter adapter = new CrimePagerAdapter(this, crimes);
         mViewPagerCrimes.setAdapter(adapter);
-
         int currentIndex = mRepository.getPosition(mCrimeId);
         mViewPagerCrimes.setCurrentItem(currentIndex);
         mViewPagerCrimes.setPageTransformer(new ZoomOutPageTransformer());
@@ -132,10 +123,9 @@ public class CrimePagerActivity extends AppCompatActivity {
         @Override
         public Fragment createFragment(int position) {
             Log.d(TAG, "position: " + (position + 1));
-
             Crime crime = mCrimes.get(position);
             CrimeDetailFragment crimeDetailFragment =
-                    CrimeDetailFragment.newInstance(crime.getId());
+                    CrimeDetailFragment.newInstance(crime.getId(),mUsername);
 
             return crimeDetailFragment;
         }

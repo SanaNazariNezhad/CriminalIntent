@@ -27,7 +27,7 @@
 
     <item
         android:id="@+id/menu_item_subtitle"
-        android:title="@string/menu_item_show_subtitle"
+        android:title="@string/menu_item_hide_subtitle"
         app:showAsAction="ifRoom|withText" />
 
 </menu>
