@@ -25,15 +25,15 @@ import android.widget.TextView;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
 import org.maktab.criminalintent.model.Crime;
-import org.maktab.criminalintent.repository.CrimeRepository;
+import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
 
 import java.util.List;
-import java.util.Set;
 
 public class CrimeListFragment extends Fragment {
 
     public static final String TAG = "CLF";
+    public static final String BUNDLE_ARG_IS_SUBTITLE_VISIBLE = "isSubtitleVisible";
 
     private RecyclerView mRecyclerView;
 
@@ -41,7 +41,7 @@ public class CrimeListFragment extends Fragment {
     private List<Crime> mCrimes;
     private CrimeAdapter mCrimeAdapter;
     private int mPosition;
-    private boolean isSubtitleVisible = false;
+    private boolean mIsSubtitleVisible = false;
     private LinearLayout mLinearLayoutEmpty;
     private LinearLayout mLinearLayoutRecycler;
     private Button mButtonNewCrime;
@@ -63,8 +63,12 @@ public class CrimeListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepository = CrimeRepository.getInstance();
+
+        mRepository = CrimeDBRepository.getInstance(getActivity());
         setHasOptionsMenu(true);
+        if (savedInstanceState != null)
+            mIsSubtitleVisible =
+                    savedInstanceState.getBoolean(BUNDLE_ARG_IS_SUBTITLE_VISIBLE, false);
 
     }
 
@@ -85,7 +89,7 @@ public class CrimeListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Crime crime = new Crime();
-                CrimeRepository.getInstance().insertCrime(crime);
+                mRepository.insertCrime(crime);
 
                 Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
                 startActivity(intent);
@@ -97,6 +101,8 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_crime_list, menu);
+        MenuItem item = menu.findItem(R.id.menu_item_subtitle);
+        setMenuItemSubtitle(item);
     }
 
     @Override
@@ -104,20 +110,17 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_add_crime:
                 Crime crime = new Crime();
-                CrimeRepository.getInstance().insertCrime(crime);
+                mRepository.insertCrime(crime);
 
                 Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
                 startActivity(intent);
 
                 return true;
             case R.id.menu_item_subtitle:
-                isSubtitleVisible = !isSubtitleVisible;
+                mIsSubtitleVisible = !mIsSubtitleVisible;
                 updateSubtitle();
+                setMenuItemSubtitle(item);
 
-                item.setTitle(
-                        isSubtitleVisible ?
-                                R.string.menu_item_hide_subtitle :
-                                R.string.menu_item_show_subtitle);
                 return true;
             case R.id.menu_item_remove_crime:
                 for (int i = 0; i <mCrimes.size() ; i++) {
@@ -141,9 +144,23 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
+    private void setMenuItemSubtitle(MenuItem item) {
+        item.setTitle(
+                mIsSubtitleVisible ?
+                        R.string.menu_item_hide_subtitle :
+                        R.string.menu_item_show_subtitle);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(BUNDLE_ARG_IS_SUBTITLE_VISIBLE, mIsSubtitleVisible);
+    }
+
     private void updateSubtitle() {
-        int numberOfCrimes = CrimeRepository.getInstance().getCrimes().size();
-        String crimesText = isSubtitleVisible ? numberOfCrimes + " crimes" : null;
+        int numberOfCrimes = mRepository.getCrimes().size();
+        String crimesText = mIsSubtitleVisible ? numberOfCrimes + " crimes" : null;
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.getSupportActionBar().setSubtitle(crimesText);
@@ -173,6 +190,7 @@ public class CrimeListFragment extends Fragment {
                 mRecyclerView.setAdapter(mCrimeAdapter);
             }else {
 //                mCrimeAdapter.notifyItemChanged(mPosition);
+                mCrimeAdapter.setCrimes(mCrimes);
                 mCrimeAdapter.notifyDataSetChanged();
             }
         }
@@ -211,14 +229,9 @@ public class CrimeListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Intent intent = CrimeDetailActivity.newIntent(getActivity(),mCrime.getId());
                     Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
                     startActivityForResult(intent,0);
 
-                    /*Intent intent = new Intent(getActivity(), CrimeDetailActivity.class);
-                    intent.putExtra(EXTRA_CRIME_ID,mCrime.getId());*/
-
-//                    Toast.makeText(getActivity(),mCrime.getTitle() + " is Clicked",Toast.LENGTH_SHORT).show();
                 }
             });
             mCheckBoxSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

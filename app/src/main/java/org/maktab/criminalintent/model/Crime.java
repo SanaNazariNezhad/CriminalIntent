@@ -15,8 +15,23 @@ public class Crime {
     private UUID mId;
 
     public Crime(){
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+        /*mId = UUID.randomUUID();
         mDate = DateUtils.randomDate();
+        mCheck_Select = false;*/
+    }
+
+    public Crime(UUID id) {
+        mId = id;
+        mDate = new Date();
+        mCheck_Select = false;
+    }
+
+    public Crime(UUID id, String title, Date date, boolean solved) {
+        mId = id;
+        mTitle = title;
+        mDate = date;
+        mSolved = solved;
         mCheck_Select = false;
     }
 

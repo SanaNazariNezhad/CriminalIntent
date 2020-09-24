@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.model.Crime;
+import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.CrimeRepository;
 import org.maktab.criminalintent.repository.IRepository;
 
@@ -95,7 +96,7 @@ public class CrimeDetailFragment extends Fragment {
 
         Log.d(TAG, "onCreate");
 
-        mRepository = CrimeRepository.getInstance();
+        mRepository = CrimeDBRepository.getInstance(getActivity());
 
         UUID crimeId = (UUID) getArguments().getSerializable(ARGUMENT_CRIME_ID);
         mCrime = mRepository.getCrime(crimeId);
@@ -141,7 +142,7 @@ public class CrimeDetailFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_delete_crime:
-                CrimeRepository.getInstance().deleteCrime(mCrime);
+                mRepository.deleteCrime(mCrime);
                 mFlagRemove = true;
 
                 Intent intent = CrimeListActivity.newIntent(getActivity());
