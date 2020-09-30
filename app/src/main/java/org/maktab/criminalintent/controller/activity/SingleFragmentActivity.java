@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 

@@ -203,14 +203,6 @@ public class CrimeDetailFragment extends Fragment {
         }
     }
 
-    private DateFormat getDateFormat() {
-        return new SimpleDateFormat("yyyy/MM/dd");
-    }
-
-    private DateFormat getTimeFormat() {
-        return new SimpleDateFormat("HH:mm:ss");
-    }
-
     private void setListeners() {
         mEditTextTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -339,4 +331,12 @@ public class CrimeDetailFragment extends Fragment {
         mButtonTime.setText(timeFormat.format(mCrime.getDate()));
     }
 
+
+    private DateFormat getDateFormat() {
+        return new SimpleDateFormat("yyyy/MM/dd");
+    }
+
+    private DateFormat getTimeFormat() {
+        return new SimpleDateFormat("HH:mm:ss");
+    }
 }
