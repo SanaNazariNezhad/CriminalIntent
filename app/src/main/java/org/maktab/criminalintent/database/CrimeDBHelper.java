@@ -21,6 +21,7 @@ public class CrimeDBHelper extends SQLiteOpenHelper {
         sbQuery_crime.append(CrimeTable.Cols.TITLE + " TEXT,");
         sbQuery_crime.append(CrimeTable.Cols.DATE + " TEXT,");
         sbQuery_crime.append(CrimeTable.Cols.SUSPECT + " TEXT, ");
+        sbQuery_crime.append(CrimeTable.Cols.SUSPECT_PHONE + " TEXT, ");
         sbQuery_crime.append(CrimeTable.Cols.SOLVED + " INTEGER");
         sbQuery_crime.append(");");
         db.execSQL(sbQuery_crime.toString());

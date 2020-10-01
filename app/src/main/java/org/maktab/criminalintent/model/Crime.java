@@ -1,8 +1,5 @@
 package org.maktab.criminalintent.model;
 
-import android.os.Build;
-
-import org.maktab.criminalintent.utils.DateUtils;
 
 import java.util.Date;
 import java.util.UUID;
@@ -12,16 +9,13 @@ public class Crime {
     private Date mDate;
     private boolean mSolved;
     private String mSuspect;
-
     private String mSuspectPhoneNumber;
-
     private boolean mCheck_Select;
     private UUID mId;
+
+
     public Crime(){
         this(UUID.randomUUID());
-        /*mId = UUID.randomUUID();
-        mDate = DateUtils.randomDate();
-        mCheck_Select = false;*/
     }
 
     public Crime(UUID id) {
@@ -30,13 +24,14 @@ public class Crime {
         mCheck_Select = false;
     }
 
-    public Crime(UUID id, String title, Date date, boolean solved,String suspect) {
+    public Crime(UUID id, String title, Date date, boolean solved,String suspect,String suspectPhoneNumber) {
         mId = id;
         mTitle = title;
         mDate = date;
         mSolved = solved;
         mCheck_Select = false;
         mSuspect = suspect;
+        mSuspectPhoneNumber = suspectPhoneNumber;
     }
 
     public String getSuspectPhoneNumber() {
