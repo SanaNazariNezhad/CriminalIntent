@@ -49,7 +49,6 @@ public class CrimeDetailFragment extends Fragment {
     public static final String FRAGMENT_TAG_TIME_PICKER = "TimePicker";
     public static final int REQUEST_CODE_DATE_PICKER = 0;
     public static final int REQUEST_CODE_TIME_PICKER = 1;
-    private static final int REQUEST_CODE_SELECT_CONTACT = 3;
     private static final int REQUEST_SELECT_PHONE_NUMBER = 2;
     public static final String TAG = "CDF";
     public static final String BUNDLE_KEY_DATE = "Date";
@@ -190,52 +189,6 @@ public class CrimeDetailFragment extends Fragment {
                 cursor.close();
             }
         }
-       /* else if (requestCode == REQUEST_CODE_SELECT_CONTACT) {
-            Uri contactUri = intent.getData();
-            String[] projection = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
-
-            Cursor cursor = getActivity().getContentResolver().query(
-                    contactUri,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            if (cursor == null || cursor.getCount() == 0)
-                return;
-
-            try {
-                cursor.moveToFirst();
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                mCrime.setSuspect(suspect);
-                mButtonSuspect.setText(suspect);
-
-                if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
-                {
-                    // Query phone here. Covered next
-                    Cursor phones = getActivity().getContentResolver().query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
-                            null,
-                            null);
-                    while (phones.moveToNext()) {
-                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        mCrime.setSuspectPhoneNumber(phoneNumber);
-                        String call = getString(R.string.call_to, mCrime.getSuspectPhoneNumber() + "");
-                        String dial = getString(R.string.dial_to, mCrime.getSuspectPhoneNumber() + "");
-                        mButtonCall.setText(call);
-                        mButtonDial.setText(dial);
-                    }
-                    phones.close();
-                }
-
-            } finally {
-
-                cursor.close();
-            }
-        }*/
     }
 
     @Override
@@ -343,10 +296,6 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = (mCurrentIndex + 1) % mRepository.repositorySize();
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
                 initViews();
-
-                /*UUID id = mRepository.nextPosition(mCrime.getId());
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), id);
-                startActivity(intent);*/
             }
         });
         mImageViewPerv.setOnClickListener(new View.OnClickListener() {
@@ -356,10 +305,6 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = (mCurrentIndex - 1 + mRepository.repositorySize()) % mRepository.repositorySize();
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
                 initViews();
-
-                /*UUID id = mRepository.pervPosition(mCrime.getId());
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), id);
-                startActivity(intent);*/
             }
         });
         mImageViewFirst.setOnClickListener(new View.OnClickListener() {
@@ -368,9 +313,6 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = 0;
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
                 initViews();
-                /*UUID id = mRepository.pervPosition(mCrime.getId());
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), id);
-                startActivity(intent);*/
             }
         });
         mImageViewLast.setOnClickListener(new View.OnClickListener() {
@@ -379,9 +321,6 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = mRepository.repositorySize() - 1;
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
                 initViews();
-                /*UUID id = mRepository.pervPosition(mCrime.getId());
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), id);
-                startActivity(intent);*/
             }
         });
         mButtonSuspect.setOnClickListener(new View.OnClickListener() {
@@ -484,11 +423,6 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     private void selectContact() {
-        /*Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-        }*/
 
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
