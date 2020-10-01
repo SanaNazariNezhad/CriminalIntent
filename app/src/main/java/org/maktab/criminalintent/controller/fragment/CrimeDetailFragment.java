@@ -3,6 +3,7 @@ package org.maktab.criminalintent.controller.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -177,8 +178,27 @@ public class CrimeDetailFragment extends Fragment {
                     (Calendar) intent.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);
             updateCrimeTime(userSelectedTime.getTime());
         }else if (requestCode == REQUEST_CODE_SELECT_CONTACT) {
-            //TODO: read a contact
             Uri contactUri = intent.getData();
+            String[] projection = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+            Cursor cursor = getActivity().getContentResolver().query(
+                    contactUri,
+                    projection,
+                    null,
+                    null,
+                    null);
+
+            if (cursor == null || cursor.getCount() == 0)
+                return;
+
+            try {
+                cursor.moveToFirst();
+
+                String suspect = cursor.getString(0);
+                mCrime.setSuspect(suspect);
+                mButtonSuspect.setText(suspect);
+            } finally {
+                cursor.close();
+            }
         }
     }
 
@@ -211,6 +231,9 @@ public class CrimeDetailFragment extends Fragment {
             DateFormat timeFormat = getTimeFormat();
             mButtonTime.setText(timeFormat.format(mCrime.getDate()));
         }
+
+        if (mCrime.getSuspect() != null)
+            mButtonSuspect.setText(mCrime.getSuspect());
     }
 
     private void setListeners() {
