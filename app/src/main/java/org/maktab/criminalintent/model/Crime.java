@@ -11,6 +11,7 @@ public class Crime {
     private String mTitle;
     private Date mDate;
     private boolean mSolved;
+    private String mSuspect;
     private boolean mCheck_Select;
     private UUID mId;
 
@@ -27,12 +28,21 @@ public class Crime {
         mCheck_Select = false;
     }
 
-    public Crime(UUID id, String title, Date date, boolean solved) {
+    public Crime(UUID id, String title, Date date, boolean solved,String suspect) {
         mId = id;
         mTitle = title;
         mDate = date;
         mSolved = solved;
         mCheck_Select = false;
+        mSuspect = suspect;
+    }
+
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
     }
 
     public boolean isCheck_Select() {

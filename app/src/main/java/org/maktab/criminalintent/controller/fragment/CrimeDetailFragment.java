@@ -3,12 +3,14 @@ package org.maktab.criminalintent.controller.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -44,6 +46,7 @@ public class CrimeDetailFragment extends Fragment {
     public static final String FRAGMENT_TAG_TIME_PICKER = "TimePicker";
     public static final int REQUEST_CODE_DATE_PICKER = 0;
     public static final int REQUEST_CODE_TIME_PICKER = 1;
+    private static final int REQUEST_CODE_SELECT_CONTACT = 2;
     public static final String TAG = "CDF";
     public static final String BUNDLE_KEY_DATE = "Date";
     public static final String BUNDLE_KEY_TIME = "Time";
@@ -51,6 +54,8 @@ public class CrimeDetailFragment extends Fragment {
     private EditText mEditTextTitle;
     private Button mButtonDate;
     private Button mButtonTime;
+    private Button mButtonSuspect;
+    private Button mButtonReport;
     private CheckBox mCheckBoxSolved;
     private IRepository mRepository;
     private Crime mCrime;
@@ -160,17 +165,20 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode != Activity.RESULT_OK || data == null)
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        if (resultCode != Activity.RESULT_OK || intent == null)
             return;
         if (requestCode == REQUEST_CODE_DATE_PICKER) {
             Calendar userSelectedDate =
-                    (Calendar) data.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
+                    (Calendar) intent.getSerializableExtra(DatePickerFragment.EXTRA_USER_SELECTED_DATE);
             updateCrimeDate(userSelectedDate.getTime());
         } else if (requestCode == REQUEST_CODE_TIME_PICKER) {
             Calendar userSelectedTime =
-                    (Calendar) data.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);
+                    (Calendar) intent.getSerializableExtra(TimePickerFragment.EXTRA_USER_SELECTED_TIME);
             updateCrimeTime(userSelectedTime.getTime());
+        }else if (requestCode == REQUEST_CODE_SELECT_CONTACT) {
+            //TODO: read a contact
+            Uri contactUri = intent.getData();
         }
     }
 
@@ -185,6 +193,8 @@ public class CrimeDetailFragment extends Fragment {
         mEditTextTitle = view.findViewById(R.id.crime_title);
         mButtonDate = view.findViewById(R.id.crime_date);
         mButtonTime = view.findViewById(R.id.crime_time);
+        mButtonSuspect = view.findViewById(R.id.choose_suspect);
+        mButtonReport = view.findViewById(R.id.send_report);
         mCheckBoxSolved = view.findViewById(R.id.crime_solved);
         mImageViewNext = view.findViewById(R.id.imgBtn_next);
         mImageViewPerv = view.findViewById(R.id.imgBtn_Prev);
@@ -308,6 +318,19 @@ public class CrimeDetailFragment extends Fragment {
                 startActivity(intent);*/
             }
         });
+        mButtonSuspect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectContact();
+            }
+        });
+
+        mButtonReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareReportIntent();
+            }
+        });
     }
 
     private void updateCrime() {
@@ -338,5 +361,51 @@ public class CrimeDetailFragment extends Fragment {
 
     private DateFormat getTimeFormat() {
         return new SimpleDateFormat("HH:mm:ss");
+    }
+
+    private String getReport() {
+        String title = mCrime.getTitle();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:SS");
+        String dateString = simpleDateFormat.format(mCrime.getDate());
+
+        String solvedString = mCrime.isSolved() ?
+                getString(R.string.crime_report_solved) :
+                getString(R.string.crime_report_unsolved);
+
+        String suspectString = mCrime.getSuspect() == null ?
+                getString(R.string.crime_report_no_suspect) :
+                getString(R.string.crime_report_suspect, mCrime.getSuspect());
+
+        String report = getString(
+                R.string.crime_report,
+                title,
+                dateString,
+                solvedString,
+                suspectString);
+
+        return report;
+    }
+
+    private void shareReportIntent() {
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getReport());
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent =
+                Intent.createChooser(sendIntent, getString(R.string.send_report));
+
+        //we prevent app from crash if the intent has no destination.
+        if (sendIntent.resolveActivity(getActivity().getPackageManager()) != null)
+            startActivity(shareIntent);
+    }
+
+    private void selectContact() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+        }
     }
 }

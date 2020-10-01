@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.maktab.criminalintent.CrimeCursorWrapper;
 import org.maktab.criminalintent.database.CrimeDBHelper;
 import org.maktab.criminalintent.database.CrimeDBSchema;
 import org.maktab.criminalintent.model.Crime;
@@ -21,7 +22,6 @@ public class CrimeDBRepository implements IRepository {
 
     private SQLiteDatabase mDatabase;
     private Context mContext;
-    private List<Crime> mCrimes;
 
     public static CrimeDBRepository getInstance(Context context) {
         if (sInstance == null)
@@ -40,34 +40,25 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public List<Crime> getCrimes() {
-        mCrimes = new ArrayList<>();
+        List<Crime> crimes = new ArrayList<>();
 
-        Cursor cursor = mDatabase.query(
-                CrimeDBSchema.CrimeTable.NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        CrimeCursorWrapper crimeCursorWrapper = queryCrimeCursor(null, null);
 
-        if (cursor == null || cursor.getCount() == 0)
-            return mCrimes;
+        if (crimeCursorWrapper == null || crimeCursorWrapper.getCount() == 0)
+            return crimes;
 
         try {
-            cursor.moveToFirst();
+            crimeCursorWrapper.moveToFirst();
 
-            while (!cursor.isAfterLast()) {
-                Crime crime = extractCrimeFromCursor(cursor);
-                mCrimes.add(crime);
-
-                cursor.moveToNext();
+            while (!crimeCursorWrapper.isAfterLast()) {
+                crimes.add(crimeCursorWrapper.getCrime());
+                crimeCursorWrapper.moveToNext();
             }
         } finally {
-            cursor.close();
+            crimeCursorWrapper.close();
         }
 
-        return mCrimes;
+        return crimes;
     }
 
     @Override
@@ -75,6 +66,20 @@ public class CrimeDBRepository implements IRepository {
         String where = Cols.UUID + " = ?";
         String[] whereArgs = new String[]{crimeId.toString()};
 
+        CrimeCursorWrapper crimeCursorWrapper = queryCrimeCursor(where, whereArgs);
+
+        if (crimeCursorWrapper == null || crimeCursorWrapper.getCount() == 0)
+            return null;
+
+        try {
+            crimeCursorWrapper.moveToFirst();
+            return crimeCursorWrapper.getCrime();
+        } finally {
+            crimeCursorWrapper.close();
+        }
+    }
+
+    private CrimeCursorWrapper queryCrimeCursor(String where, String[] whereArgs) {
         Cursor cursor = mDatabase.query(
                 CrimeDBSchema.CrimeTable.NAME,
                 null,
@@ -84,17 +89,8 @@ public class CrimeDBRepository implements IRepository {
                 null,
                 null);
 
-        if (cursor == null || cursor.getCount() == 0)
-            return null;
-
-        try {
-            cursor.moveToFirst();
-            Crime crime = extractCrimeFromCursor(cursor);
-
-            return crime;
-        } finally {
-            cursor.close();
-        }
+        CrimeCursorWrapper crimeCursorWrapper = new CrimeCursorWrapper(cursor);
+        return crimeCursorWrapper;
     }
 
     @Override
@@ -120,8 +116,9 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public int getPosition(UUID crimeId) {
-        for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).getId().equals(crimeId))
+        List<Crime> crimes = getCrimes();
+        for (int i = 0; i < crimes.size(); i++) {
+            if (crimes.get(i).getId().equals(crimeId))
                 return i;
         }
         return -1;
@@ -129,9 +126,10 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public UUID nextPosition(UUID crimeId) {
-        for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).getId().equals(crimeId))
-                return mCrimes.get(i + 1).getId();
+        List<Crime> crimes = getCrimes();
+        for (int i = 0; i < crimes.size(); i++) {
+            if (crimes.get(i).getId().equals(crimeId))
+                return crimes.get(i + 1).getId();
         }
 
         return null;
@@ -139,9 +137,10 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public UUID pervPosition(UUID crimeId) {
-        for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).getId().equals(crimeId))
-                return mCrimes.get(i - 1).getId();
+        List<Crime> crimes = getCrimes();
+        for (int i = 0; i < crimes.size(); i++) {
+            if (crimes.get(i).getId().equals(crimeId))
+                return crimes.get(i - 1).getId();
         }
 
         return null;
@@ -149,27 +148,31 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public void setCrimesSelected(){
-        for (Crime crime : mCrimes) {
+        List<Crime> crimes = getCrimes();
+        for (Crime crime : crimes) {
             crime.setCheck_Select(true);
         }
     }
 
     @Override
     public void setCrimesUnSelected(){
-        for (Crime crime : mCrimes) {
+        List<Crime> crimes = getCrimes();
+        for (Crime crime : crimes) {
             crime.setCheck_Select(false);
         }
     }
 
     @Override
     public int repositorySize() {
-        return mCrimes.size();
+        List<Crime> crimes = getCrimes();
+        return crimes.size();
     }
 
     @Override
     public int getIndexOfCrime(Crime crime) {
-        for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).equals(crime))
+        List<Crime> crimes = getCrimes();
+        for (int i = 0; i < crimes.size(); i++) {
+            if (crimes.get(i).equals(crime))
                 return i;
         }
         return -1;
@@ -177,7 +180,8 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public Crime getCrimeWithIndex(int index) {
-        return mCrimes.get(index);
+        List<Crime> crimes = getCrimes();
+        return crimes.get(index);
     }
 
 
@@ -186,16 +190,8 @@ public class CrimeDBRepository implements IRepository {
         values.put(Cols.UUID, crime.getId().toString());
         values.put(Cols.TITLE, crime.getTitle());
         values.put(Cols.DATE, crime.getDate().getTime());
+        values.put(Cols.SUSPECT, crime.getSuspect());
         values.put(Cols.SOLVED, crime.isSolved() ? 1 : 0);
         return values;
-    }
-
-    private Crime extractCrimeFromCursor(Cursor cursor) {
-        UUID uuid = UUID.fromString(cursor.getString(cursor.getColumnIndex(Cols.UUID)));
-        String title = cursor.getString(cursor.getColumnIndex(Cols.TITLE));
-        Date date = new Date(cursor.getLong(cursor.getColumnIndex(Cols.DATE)));
-        boolean solved = cursor.getInt(cursor.getColumnIndex(Cols.SOLVED)) == 0 ? false : true;
-
-        return new Crime(uuid, title, date, solved);
     }
 }
