@@ -2,22 +2,16 @@ package org.maktab.criminalintent.controller.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.model.User;
-import org.maktab.criminalintent.repository.IUserRepository;
 import org.maktab.criminalintent.repository.UserDBRepository;
-
 import java.util.Objects;
 
 public class SignUpFragment extends Fragment {

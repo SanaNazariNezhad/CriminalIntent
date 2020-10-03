@@ -1,18 +1,14 @@
 package org.maktab.criminalintent.controller.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
-
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,13 +24,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

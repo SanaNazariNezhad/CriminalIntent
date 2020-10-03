@@ -2,9 +2,7 @@ package org.maktab.criminalintent.controller.activity;
 
 import android.content.Context;
 import android.content.Intent;
-
 import androidx.fragment.app.Fragment;
-
 import org.maktab.criminalintent.controller.fragment.CrimeListFragment;
 
 public class CrimeListActivity extends SingleFragmentActivity {

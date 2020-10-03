@@ -1,7 +1,6 @@
 package org.maktab.criminalintent.repository;
 
 import org.maktab.criminalintent.model.Crime;
-
 import java.util.List;
 import java.util.UUID;
 
