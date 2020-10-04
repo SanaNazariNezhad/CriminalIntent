@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity(tableName = "crimeTable")
@@ -116,5 +117,25 @@ public class Crime {
         mCheck_Select = false;
         mSuspect = suspect;
         mSuspectPhoneNumber = suspectPhoneNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Crime crime = (Crime) o;
+        return primaryId == crime.primaryId &&
+                mSolved == crime.mSolved &&
+                mCheck_Select == crime.mCheck_Select &&
+                Objects.equals(mId, crime.mId) &&
+                Objects.equals(mTitle, crime.mTitle) &&
+                Objects.equals(mDate, crime.mDate) &&
+                Objects.equals(mSuspect, crime.mSuspect) &&
+                Objects.equals(mSuspectPhoneNumber, crime.mSuspectPhoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(primaryId, mId, mTitle, mDate, mSolved, mSuspect, mSuspectPhoneNumber, mCheck_Select);
     }
 }

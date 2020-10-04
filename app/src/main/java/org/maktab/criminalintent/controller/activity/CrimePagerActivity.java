@@ -5,17 +5,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -23,16 +26,17 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     public static final String EXTRA_CRIME_ID = "com.example.criminalintent.crimeId";
     public static final String TAG = "CPA";
+    public static int CURRENT_INDEX;
     private static final String EXTRA_Username = "username";
     private IRepository mRepository;
     private UUID mCrimeId;
     private String mUsername;
     private ViewPager2 mViewPagerCrimes;
 
-    public static Intent newIntent(Context context, UUID crimeId,String username) {
+    public static Intent newIntent(Context context, UUID crimeId, String username) {
         Intent intent = new Intent(context, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, crimeId);
-        intent.putExtra(EXTRA_Username,username);
+        intent.putExtra(EXTRA_Username, username);
         return intent;
     }
 
@@ -45,7 +49,33 @@ public class CrimePagerActivity extends AppCompatActivity {
         mUsername = getIntent().getStringExtra(EXTRA_Username);
         findViews();
         initViews();
+//        circleViewPager();
 
+    }
+
+    private void circleViewPager() {
+        mViewPagerCrimes.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            int currentPage;
+
+            @Override
+            public void onPageSelected(int position) {
+                currentPage = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    List<Crime> crimes = mRepository.getCrimes();
+                    int pageCount = crimes.size();
+
+                    if (currentPage == 0) {
+                        mViewPagerCrimes.setCurrentItem(pageCount - 2, false);
+                    } else if (currentPage == pageCount - 1) {
+                        mViewPagerCrimes.setCurrentItem(1, false);
+                    }
+                }
+            }
+        });
     }
 
     private void findViews() {
@@ -56,8 +86,8 @@ public class CrimePagerActivity extends AppCompatActivity {
         List<Crime> crimes = mRepository.getCrimes();
         CrimePagerAdapter adapter = new CrimePagerAdapter(this, crimes);
         mViewPagerCrimes.setAdapter(adapter);
-        int currentIndex = mRepository.getPosition(mCrimeId);
-        mViewPagerCrimes.setCurrentItem(currentIndex);
+        CURRENT_INDEX = mRepository.getPosition(mCrimeId);
+        mViewPagerCrimes.setCurrentItem(CURRENT_INDEX);
         mViewPagerCrimes.setPageTransformer(new ZoomOutPageTransformer());
     }
 
@@ -125,7 +155,7 @@ public class CrimePagerActivity extends AppCompatActivity {
             Log.d(TAG, "position: " + (position + 1));
             Crime crime = mCrimes.get(position);
             CrimeDetailFragment crimeDetailFragment =
-                    CrimeDetailFragment.newInstance(crime.getId(),mUsername);
+                    CrimeDetailFragment.newInstance(crime.getId(), mUsername);
 
             return crimeDetailFragment;
         }

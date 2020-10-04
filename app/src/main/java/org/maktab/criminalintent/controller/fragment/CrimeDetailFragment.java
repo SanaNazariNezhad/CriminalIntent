@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
+import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
@@ -289,7 +290,9 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
                 mCurrentIndex = (mCurrentIndex + 1) % mRepository.repositorySize();
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
-                initViews();
+                Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
+                startActivity(crimePagerActivityIntent);
+//                initViews();
             }
         });
         mImageViewPerv.setOnClickListener(new View.OnClickListener() {
@@ -298,7 +301,9 @@ public class CrimeDetailFragment extends Fragment {
                 mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
                 mCurrentIndex = (mCurrentIndex - 1 + mRepository.repositorySize()) % mRepository.repositorySize();
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
-                initViews();
+                Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
+                startActivity(crimePagerActivityIntent);
+//                initViews();
             }
         });
         mImageViewFirst.setOnClickListener(new View.OnClickListener() {
@@ -306,7 +311,9 @@ public class CrimeDetailFragment extends Fragment {
             public void onClick(View view) {
                 mCurrentIndex = 0;
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
-                initViews();
+                Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
+                startActivity(crimePagerActivityIntent);
+//                initViews();
             }
         });
         mImageViewLast.setOnClickListener(new View.OnClickListener() {
@@ -314,7 +321,9 @@ public class CrimeDetailFragment extends Fragment {
             public void onClick(View view) {
                 mCurrentIndex = mRepository.repositorySize() - 1;
                 mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
-                initViews();
+                Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
+                startActivity(crimePagerActivityIntent);
+//                initViews();
             }
         });
         mButtonSuspect.setOnClickListener(new View.OnClickListener() {
