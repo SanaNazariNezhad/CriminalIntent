@@ -30,8 +30,7 @@
             android:gravity="center"
             android:text="@string/date_picker_title"
             android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            style="@style/TextAppearance.AppCompat.Title.Inverse" />
     </LinearLayout>
 
     <LinearLayout
@@ -58,18 +57,17 @@
             android:id="@+id/btn_cancel_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:backgroundTint="@color/white"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:text="@android:string/cancel"
-            android:textColor="@color/background" />
+            android:textColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/btn_ok_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:text="@android:string/ok"
-            android:textColor="@color/background" />
+            android:textColor="@color/colorAccent" />
     </LinearLayout>
 
 </LinearLayout>
