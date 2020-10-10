@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".controller.activity.CrimeDetailActivity">
+    tools:context=".controller.activity.SingleFragmentActivity">
 
     <FrameLayout
         android:id="@+id/fragment_container"

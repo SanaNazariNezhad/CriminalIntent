@@ -2,6 +2,7 @@ package org.maktab.criminalintent.controller.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -37,6 +38,7 @@ import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
+import com.example.criminalintent.utils.PictureUtils;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -52,7 +54,7 @@ public class CrimeDetailFragment extends Fragment {
     public static final String ARGUMENT_USERNAME = "username";
     public static final String FRAGMENT_TAG_DATE_PICKER = "DatePicker";
     public static final String FRAGMENT_TAG_TIME_PICKER = "TimePicker";
-    public static final String AUTHORITY = "com.example.criminalintent.fileProvider";
+    public static final String AUTHORITY = "org.maktab.criminalintent.fileProvider";
     public static final int REQUEST_CODE_DATE_PICKER = 0;
     public static final int REQUEST_CODE_TIME_PICKER = 1;
     private static final int REQUEST_SELECT_PHONE_NUMBER = 2;
@@ -79,8 +81,9 @@ public class CrimeDetailFragment extends Fragment {
     private String mDate, mTime;
     private boolean flag = false;
     private boolean mFlagRemove = false;
-
     private int mCurrentIndex;
+
+    private Callbacks mCallbacks;
 
 
     public static CrimeDetailFragment newInstance(UUID crimeId, String username) {
@@ -95,6 +98,18 @@ public class CrimeDetailFragment extends Fragment {
 
     public CrimeDetailFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof Callbacks)
+            mCallbacks = (Callbacks) context;
+        else {
+            throw new ClassCastException(context.toString()
+                    + " must implement Callbacks");
+        }
     }
 
     @Override
@@ -136,6 +151,12 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        updateCrime();
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_crime_detail, menu);
     }
@@ -156,12 +177,6 @@ public class CrimeDetailFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        updateCrime();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
         if (resultCode != Activity.RESULT_OK || intent == null)
             return;
@@ -176,34 +191,38 @@ public class CrimeDetailFragment extends Fragment {
         }
         else if (requestCode == REQUEST_SELECT_PHONE_NUMBER){
             // Get the URI and query the content provider for the phone number
-            Uri contactUri = intent.getData();
-            String[] projection = new String[]{ContactsContract.Contacts.DISPLAY_NAME,ContactsContract.CommonDataKinds.Phone.NUMBER};
-            Cursor cursor = getActivity().getContentResolver().query(contactUri, projection,
-                    null, null, null);
-            // If the cursor returned is valid, get the phone number
-            if (cursor == null || cursor.getCount() == 0)
-                return;
-
-            try {
-                cursor.moveToFirst();
-                int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                String number = cursor.getString(numberIndex);
-                mCrime.setSuspectPhoneNumber(number);
-                String dial = getString(R.string.dial_to, mCrime.getSuspectPhoneNumber() + "");
-                String call = getString(R.string.call_to, mCrime.getSuspectPhoneNumber() + "");
-                mButtonCall.setText(call);
-                mButtonDial.setText(dial);
-                String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                mCrime.setSuspect(suspect);
-                mButtonSuspect.setText(suspect);
-            }finally {
-                cursor.close();
-            }
+            handleSelectedContactNumber(intent);
         }else if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
             Uri photoUri = generateUriForPhotoFile();
             getActivity().revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
             updatePhotoView();
+        }
+    }
+
+    private void handleSelectedContactNumber(Intent intent) {
+        Uri contactUri = intent.getData();
+        String[] projection = new String[]{ContactsContract.Contacts.DISPLAY_NAME,ContactsContract.CommonDataKinds.Phone.NUMBER};
+        Cursor cursor = getActivity().getContentResolver().query(contactUri, projection,
+                null, null, null);
+        // If the cursor returned is valid, get the phone number
+        if (cursor == null || cursor.getCount() == 0)
+            return;
+
+        try {
+            cursor.moveToFirst();
+            int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            String number = cursor.getString(numberIndex);
+            mCrime.setSuspectPhoneNumber(number);
+            String dial = getString(R.string.dial_to, mCrime.getSuspectPhoneNumber() + "");
+            String call = getString(R.string.call_to, mCrime.getSuspectPhoneNumber() + "");
+            mButtonCall.setText(call);
+            mButtonDial.setText(dial);
+            String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            mCrime.setSuspect(suspect);
+            mButtonSuspect.setText(suspect);
+        }finally {
+            cursor.close();
         }
     }
 
@@ -261,6 +280,7 @@ public class CrimeDetailFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d(TAG, "onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -274,6 +294,7 @@ public class CrimeDetailFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 mCrime.setSolved(isChecked);
+                updateCrime();
             }
         });
 
@@ -387,47 +408,12 @@ public class CrimeDetailFragment extends Fragment {
         });
     }
 
-    private void takePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try {
-            if (mPhotoFile != null && takePictureIntent
-                    .resolveActivity(getActivity().getPackageManager()) != null) {
-
-                /*File filesDir = getContext().getFilesDir();
-                Uri photoUri = Uri.fromFile(filesDir);*/
-
-                // file:///data/data/com.example.ci/files/234234234234.jpg
-                Uri photoUri = generateUriForPhotoFile();
-
-                List<ResolveInfo> activities = getActivity().getPackageManager()
-                        .queryIntentActivities(
-                                takePictureIntent,
-                                PackageManager.MATCH_DEFAULT_ONLY);
-                for (ResolveInfo activity: activities) {
-                    getActivity().grantUriPermission(
-                            activity.activityInfo.packageName,
-                            photoUri,
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                }
-
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
-            }
-        } catch (ActivityNotFoundException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private Uri generateUriForPhotoFile() {
-        return FileProvider.getUriForFile(
-                getContext(),
-                AUTHORITY,
-                mPhotoFile);
-    }
-
     private void updateCrime() {
         if (!mFlagRemove) {
             mRepository.updateCrime(mCrime);
+
+            //todo: anti pattern
+            mCallbacks.onCrimeUpdated(mCrime);
         }
     }
 
@@ -444,7 +430,6 @@ public class CrimeDetailFragment extends Fragment {
         DateFormat timeFormat = getTimeFormat();
         mButtonTime.setText(timeFormat.format(mCrime.getDate()));
     }
-
 
     private DateFormat getDateFormat() {
         return new SimpleDateFormat("yyyy/MM/dd");
@@ -492,6 +477,47 @@ public class CrimeDetailFragment extends Fragment {
         }
     }
 
+    private void takePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            if (mPhotoFile != null && takePictureIntent
+                    .resolveActivity(getActivity().getPackageManager()) != null) {
+
+                // file:///data/data/com.example.ci/files/234234234234.jpg
+                Uri photoUri = generateUriForPhotoFile();
+
+                grantWriteUriToAllResolvedActivities(takePictureIntent, photoUri);
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
+            }
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void grantWriteUriToAllResolvedActivities(Intent takePictureIntent, Uri photoUri) {
+        List<ResolveInfo> activities = getActivity().getPackageManager()
+                .queryIntentActivities(
+                        takePictureIntent,
+                        PackageManager.MATCH_DEFAULT_ONLY);
+
+        for (ResolveInfo activity: activities) {
+            getActivity().grantUriPermission(
+                    activity.activityInfo.packageName,
+                    photoUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        }
+    }
+
+    private Uri generateUriForPhotoFile() {
+        return FileProvider.getUriForFile(
+                getContext(),
+                AUTHORITY,
+                mPhotoFile);
+    }
+
+
     private void selectContact() {
 
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -510,5 +536,9 @@ public class CrimeDetailFragment extends Fragment {
         //this has a better memory management.
         Bitmap bitmap = com.example.criminalintent.utils.PictureUtils.getScaledBitmap(mPhotoFile.getAbsolutePath(), getActivity());
         mImageViewPhoto.setImageBitmap(bitmap);
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
     }
 }

@@ -1,5 +1,6 @@
 package org.maktab.criminalintent.controller.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -41,6 +42,8 @@ public class CrimeListFragment extends Fragment {
     private Button mButtonNewCrime;
     private String mUsername;
 
+    private Callbacks mCallbacks;
+
     public static CrimeListFragment newInstance(String username) {
         Bundle args = new Bundle();
         args.putString(ARG_Username,username);
@@ -52,6 +55,19 @@ public class CrimeListFragment extends Fragment {
     public CrimeListFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof Callbacks)
+            mCallbacks = (Callbacks) context;
+        else {
+            throw new ClassCastException(context.toString()
+                    + " must implement Callbacks");
+        }
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,8 +99,8 @@ public class CrimeListFragment extends Fragment {
             public void onClick(View v) {
                 Crime crime = new Crime();
                 mRepository.insertCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId(),mUsername);
-                startActivity(intent);
+                mCallbacks.onCrimeSelected(crime);
+                updateUI();
             }
         });
     }
@@ -103,8 +119,8 @@ public class CrimeListFragment extends Fragment {
             case R.id.menu_item_add_crime:
                 Crime crime = new Crime();
                 mRepository.insertCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId(),mUsername);
-                startActivity(intent);
+                mCallbacks.onCrimeSelected(crime);
+                updateUI();
                 return true;
 
             case R.id.menu_item_subtitle:
@@ -172,7 +188,7 @@ public class CrimeListFragment extends Fragment {
         updateUI();
     }
 
-    private void updateUI() {
+    public void updateUI() {
         mCrimes = mRepository.getCrimes();
         if (mCrimes.size() != 0){
             mLinearLayoutEmpty.setVisibility(View.GONE);
@@ -219,8 +235,9 @@ public class CrimeListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId(),mUsername);
-                    startActivityForResult(intent,0);
+                    /*Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId(),mUsername);
+                    startActivityForResult(intent,0);*/
+                    mCallbacks.onCrimeSelected(mCrime);
 
                 }
             });
@@ -284,5 +301,9 @@ public class CrimeListFragment extends Fragment {
 
         }
 
+    }
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
     }
 }

@@ -22,7 +22,8 @@ import org.maktab.criminalintent.repository.IRepository;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements
+        CrimeDetailFragment.Callbacks{
 
     public static final String EXTRA_CRIME_ID = "com.example.criminalintent.crimeId";
     public static final String TAG = "CPA";
@@ -89,6 +90,11 @@ public class CrimePagerActivity extends AppCompatActivity {
         CURRENT_INDEX = mRepository.getPosition(mCrimeId);
         mViewPagerCrimes.setCurrentItem(CURRENT_INDEX);
         mViewPagerCrimes.setPageTransformer(new ZoomOutPageTransformer());
+    }
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+        //nothing
     }
 
     public class ZoomOutPageTransformer implements ViewPager2.PageTransformer {
