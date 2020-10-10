@@ -1,7 +1,6 @@
 package org.maktab.criminalintent.controller.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,14 +16,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
+import org.maktab.criminalintent.controller.SwipeableRecyclerView;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
+
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
@@ -41,6 +45,7 @@ public class CrimeListFragment extends Fragment {
     private LinearLayout mLinearLayoutRecycler;
     private Button mButtonNewCrime;
     private String mUsername;
+    private FrameLayout mFrameLayoutCrimeList;
 
     private Callbacks mCallbacks;
 
@@ -185,6 +190,38 @@ public class CrimeListFragment extends Fragment {
     private void initViews() {
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        swipeRecycler();
+        updateUI();
+    }
+
+    private void swipeRecycler() {
+        /*  set swipe touch listener */
+        SwipeableRecyclerView swipeTouchListener = new
+                SwipeableRecyclerView(mRecyclerView,
+                new SwipeableRecyclerView.SwipeListener() {
+
+            @Override
+            public boolean canSwipeRight(int position) {
+                //enable/disable right swipe on checkbox base else use true/false
+                return true;
+            }
+
+            @Override
+            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                //on cardview swipe right dismiss update adapter
+                onCardViewDismiss(reverseSortedPositions, mCrimes, mCrimeAdapter);
+            }
+        });
+
+        //add item touch listener to recycler view
+        mRecyclerView.addOnItemTouchListener(swipeTouchListener);
+    }
+
+    private void onCardViewDismiss(int[] reverseSortedPositions, List<Crime> crimes, CrimeAdapter recyclerViewAdapter) {
+        for (int position : reverseSortedPositions) {
+            mRepository.deleteCrime(crimes.get(position));
+        }
+        Snackbar.make(mFrameLayoutCrimeList,R.string.crime_dismiss_success,Snackbar.LENGTH_SHORT).show();
         updateUI();
     }
 
@@ -214,6 +251,7 @@ public class CrimeListFragment extends Fragment {
         mLinearLayoutEmpty = view.findViewById(R.id.empty_layout);
         mLinearLayoutRecycler = view.findViewById(R.id.recycler_layout);
         mButtonNewCrime = view.findViewById(R.id.btn_newCrime);
+        mFrameLayoutCrimeList = view.findViewById(R.id.crime_list_layout);
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder {

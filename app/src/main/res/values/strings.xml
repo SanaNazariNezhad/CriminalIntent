@@ -44,4 +44,6 @@
     <string name="dial_to">Dial to %s</string>
     <string name="call">Call</string>
     <string name="dial">Dial</string>
+
+    <string name="crime_dismiss_success">Crime Dismissed Successfully.</string>
 </resources>
