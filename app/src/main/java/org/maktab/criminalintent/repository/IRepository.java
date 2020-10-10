@@ -1,6 +1,8 @@
 package org.maktab.criminalintent.repository;
 
 import org.maktab.criminalintent.model.Crime;
+
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,4 +20,5 @@ public interface IRepository {
     int repositorySize();
     public void setCrimesSelected();
     public void setCrimesUnSelected();
+    File getPhotoFile(Crime crime);
 }

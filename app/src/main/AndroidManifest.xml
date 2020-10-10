@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.maktab.criminalintent">
 
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
@@ -22,6 +26,15 @@
         <activity android:name=".controller.activity.CrimePagerActivity"
             android:parentActivityName=".controller.activity.CrimeListActivity"/>
         <activity android:name=".controller.activity.CrimeListActivity" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.maktab.criminalintent.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files_path"/>
+        </provider>
     </application>
 
 </manifest>

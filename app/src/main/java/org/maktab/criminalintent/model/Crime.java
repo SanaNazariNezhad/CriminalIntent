@@ -138,4 +138,8 @@ public class Crime {
     public int hashCode() {
         return Objects.hash(primaryId, mId, mTitle, mDate, mSolved, mSuspect, mSuspectPhoneNumber, mCheck_Select);
     }
+
+    public String getPhotoFileName() {
+        return "IMG_" + getId().toString() + ".jpg";
+    }
 }

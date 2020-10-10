@@ -5,6 +5,8 @@ import androidx.room.Room;
 import org.maktab.criminalintent.database.CrimeDatabase;
 import org.maktab.criminalintent.database.CrimeDatabaseDAO;
 import org.maktab.criminalintent.model.Crime;
+
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -126,6 +128,16 @@ public class CrimeDBRepository implements IRepository {
     public Crime getCrimeWithIndex(int index) {
         List<Crime> crimes = getCrimes();
         return crimes.get(index);
+    }
+
+    @Override
+    public File getPhotoFile(Crime crime) {
+        // /data/data/com.example.criminalintent/files/
+        File filesDir = mContext.getFilesDir();
+
+        // /data/data/com.example.criminalintent/files/IMG_ktui4u544nmkfuy48485.jpg
+        File photoFile = new File(filesDir, crime.getPhotoFileName());
+        return photoFile;
     }
 
 }
