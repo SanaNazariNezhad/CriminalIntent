@@ -2,11 +2,13 @@ package org.maktab.criminalintent.controller.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,10 +50,11 @@ public class CrimeListFragment extends Fragment {
     private FrameLayout mFrameLayoutCrimeList;
 
     private Callbacks mCallbacks;
+    private Crime mCrimeUndo;
 
     public static CrimeListFragment newInstance(String username) {
         Bundle args = new Bundle();
-        args.putString(ARG_Username,username);
+        args.putString(ARG_Username, username);
         CrimeListFragment fragment = new CrimeListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -134,11 +137,11 @@ public class CrimeListFragment extends Fragment {
                 setMenuItemSubtitle(item);
                 return true;
 
-            case R.id.menu_item_remove_crime:
-                for (int i = 0; i <mCrimes.size() ; i++) {
+            case R.id.menu_item_remove_selected_crime:
+                for (int i = 0; i < mCrimes.size(); i++) {
                     if (mCrimes.get(i).isCheck_Select()) {
                         mRepository.deleteCrime(mCrimes.get(i));
-                        i-=1;
+                        i -= 1;
                     }
                 }
                 updateUI();
@@ -188,7 +191,6 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void initViews() {
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         swipeRecycler();
         updateUI();
@@ -200,45 +202,51 @@ public class CrimeListFragment extends Fragment {
                 SwipeableRecyclerView(mRecyclerView,
                 new SwipeableRecyclerView.SwipeListener() {
 
-            @Override
-            public boolean canSwipeRight(int position) {
-                //enable/disable right swipe on checkbox base else use true/false
-                return true;
-            }
+                    @Override
+                    public boolean canSwipeRight(int position) {
+                        //enable/disable right swipe on checkbox base else use true/false
+                        return true;
+                    }
 
-            @Override
-            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
-                //on cardview swipe right dismiss update adapter
-                onCardViewDismiss(reverseSortedPositions, mCrimes, mCrimeAdapter);
-            }
-        });
+                    @Override
+                    public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                        //on recycler view swipe right dismiss update adapter
+                        onRecyclerViewDismiss(reverseSortedPositions, mCrimes);
+                    }
+                });
 
         //add item touch listener to recycler view
         mRecyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
-    private void onCardViewDismiss(int[] reverseSortedPositions, List<Crime> crimes, CrimeAdapter recyclerViewAdapter) {
+    private void onRecyclerViewDismiss(int[] reverseSortedPositions, List<Crime> crimes) {
         for (int position : reverseSortedPositions) {
+            mCrimeUndo = crimes.get(position);
             mRepository.deleteCrime(crimes.get(position));
         }
-        Snackbar.make(mFrameLayoutCrimeList,R.string.crime_dismiss_success,Snackbar.LENGTH_SHORT).show();
         updateUI();
+        showSnackBar();
+    }
+
+    private void showSnackBar() {
+        Snackbar snackbar = Snackbar.make(mFrameLayoutCrimeList, R.string.crime_dismiss_success, Snackbar.LENGTH_SHORT);
+        snackbar.setAction(R.string.crime_dismiss_undo,new MyUndoListener());
+        snackbar.show();
     }
 
     public void updateUI() {
         mCrimes = mRepository.getCrimes();
-        if (mCrimes.size() != 0){
+        if (mCrimes.size() != 0) {
             mLinearLayoutEmpty.setVisibility(View.GONE);
             mLinearLayoutRecycler.setVisibility(View.VISIBLE);
             if (mCrimeAdapter == null) {
                 mCrimeAdapter = new CrimeAdapter(mCrimes);
                 mRecyclerView.setAdapter(mCrimeAdapter);
-            }else {
+            } else {
                 mCrimeAdapter.setCrimes(mCrimes);
                 mCrimeAdapter.notifyDataSetChanged();
             }
-        }
-        else {
+        } else {
             mLinearLayoutEmpty.setVisibility(View.VISIBLE);
             mLinearLayoutRecycler.setVisibility(View.GONE);
 
@@ -273,8 +281,6 @@ public class CrimeListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /*Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId(),mUsername);
-                    startActivityForResult(intent,0);*/
                     mCallbacks.onCrimeSelected(mCrime);
 
                 }
@@ -289,22 +295,20 @@ public class CrimeListFragment extends Fragment {
             });
         }
 
-        public void bindCrime(Crime crime){
+        public void bindCrime(Crime crime) {
             mCrime = crime;
             mTextViewTitle.setText(crime.getTitle());
             mTextViewDate.setText(crime.getDate().toString());
             mImageViewSolved.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
             mCheckBoxSelect.setChecked(crime.isCheck_Select());
-
-
         }
     }
 
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
+    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
         private List<Crime> mCrimes;
 
-        public List<Crime> getCrimes(){
+        public List<Crime> getCrimes() {
             return mCrimes;
         }
 
@@ -326,7 +330,7 @@ public class CrimeListFragment extends Fragment {
         public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(R.layout.crime_row_list,parent,false);
+            View view = layoutInflater.inflate(R.layout.crime_row_list, parent, false);
             CrimeHolder crimeHolder = new CrimeHolder(view);
             return crimeHolder;
         }
@@ -336,12 +340,19 @@ public class CrimeListFragment extends Fragment {
 
             Crime crime = mCrimes.get(position);
             holder.bindCrime(crime);
-
         }
-
     }
 
     public interface Callbacks {
         void onCrimeSelected(Crime crime);
+    }
+
+    public class MyUndoListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            mRepository.insertCrime(mCrimeUndo);
+            updateUI();
+        }
     }
 }

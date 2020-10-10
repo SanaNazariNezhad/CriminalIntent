@@ -8,9 +8,9 @@
         android:title="@string/menu_add_crime"
         app:showAsAction="ifRoom|withText" />
     <item
-        android:id="@+id/menu_item_remove_crime"
+        android:id="@+id/menu_item_remove_selected_crime"
         android:icon="@drawable/ic_delete_forever"
-        android:title="@string/menu_delete_crime"
+        android:title="@string/menu_delete_selected_crime"
         app:showAsAction="ifRoom|withText" />
 
     <item

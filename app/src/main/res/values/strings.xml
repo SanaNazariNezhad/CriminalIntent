@@ -13,6 +13,7 @@
     <string name="time_picker_title">Time of crime:</string>
 
     <string name="menu_add_crime">Add Crime</string>
+    <string name="menu_delete_selected_crime">Delete Selected Crime</string>
     <string name="menu_delete_crime">Delete Crime</string>
     <string name="menu_selectAll_crime">Select All Crimes</string>
     <string name="menu_unSelectAll_crime">UnSelect All Crimes</string>
@@ -46,4 +47,5 @@
     <string name="dial">Dial</string>
 
     <string name="crime_dismiss_success">Crime Dismissed Successfully.</string>
+    <string name="crime_dismiss_undo">UNDO</string>
 </resources>
