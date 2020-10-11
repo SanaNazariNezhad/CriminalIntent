@@ -94,18 +94,21 @@ public class CrimeDBRepository implements IRepository {
 
     @Override
     public void setCrimesSelected(){
-        List<Crime> crimes = getCrimes();
-        for (Crime crime : crimes) {
-            crime.setCheck_Select(true);
-        }
+        mCrimeDAO.setCrimesSelected();
     }
 
     @Override
     public void setCrimesUnSelected(){
-        List<Crime> crimes = getCrimes();
+        /*List<Crime> crimes = getCrimes();
         for (Crime crime : crimes) {
             crime.setCheck_Select(false);
-        }
+        }*/
+        mCrimeDAO.setCrimesUnSelected();
+    }
+
+    @Override
+    public void deleteSelectedCrime(){
+        mCrimeDAO.deleteSelectedCrime();
     }
 
     @Override

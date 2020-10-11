@@ -32,7 +32,8 @@ public class Crime {
     @ColumnInfo(name = "suspectPhone")
     private String mSuspectPhoneNumber;
 
-    private boolean mCheck_Select;
+    @ColumnInfo(name = "selectedCrime")
+    private int mCheck_Select;
 
     public long getPrimaryId() {
         return primaryId;
@@ -90,14 +91,13 @@ public class Crime {
         mSuspectPhoneNumber = suspectPhoneNumber;
     }
 
-    public boolean isCheck_Select() {
+    public int getCheck_Select() {
         return mCheck_Select;
     }
 
-    public void setCheck_Select(boolean check_Select) {
+    public void setCheck_Select(int check_Select) {
         mCheck_Select = check_Select;
     }
-
 
     public Crime(){
         this(UUID.randomUUID());
@@ -106,7 +106,7 @@ public class Crime {
     public Crime(UUID id) {
         mId = id;
         mDate = new Date();
-        mCheck_Select = false;
+        mCheck_Select = 0;
     }
 
     public Crime(UUID id, String title, Date date, boolean solved,String suspect,String suspectPhoneNumber) {
@@ -114,7 +114,7 @@ public class Crime {
         mTitle = title;
         mDate = date;
         mSolved = solved;
-        mCheck_Select = false;
+        mCheck_Select = 0;
         mSuspect = suspect;
         mSuspectPhoneNumber = suspectPhoneNumber;
     }

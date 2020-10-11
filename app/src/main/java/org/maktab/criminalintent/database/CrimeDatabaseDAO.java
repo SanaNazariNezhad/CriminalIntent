@@ -31,6 +31,15 @@ public interface CrimeDatabaseDAO {
     @Query("SELECT * FROM crimeTable WHERE uuid =:inputUUID")
     Crime getCrime(UUID inputUUID);
 
+    @Query("UPDATE crimeTable SET selectedCrime = 1")
+    void setCrimesSelected();
+
+    @Query("UPDATE crimeTable SET selectedCrime = 0")
+    void setCrimesUnSelected();
+
+    @Query("DELETE FROM crimeTable WHERE selectedCrime = 1")
+    void deleteSelectedCrime();
+
     @Query("SELECT * FROM crimeTable ORDER BY id ASC LIMIT 1")
     Crime getLastCrime();
 

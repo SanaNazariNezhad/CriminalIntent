@@ -83,6 +83,7 @@ public class CrimeListFragment extends Fragment {
 
         mUsername = getArguments().getString(ARG_Username);
         mRepository = CrimeDBRepository.getInstance(getActivity());
+        mRepository.setCrimesUnSelected();
         setHasOptionsMenu(true);
         if (savedInstanceState != null)
             mIsSubtitleVisible =
@@ -138,12 +139,7 @@ public class CrimeListFragment extends Fragment {
                 return true;
 
             case R.id.menu_item_remove_selected_crime:
-                for (int i = 0; i < mCrimes.size(); i++) {
-                    if (mCrimes.get(i).isCheck_Select()) {
-                        mRepository.deleteCrime(mCrimes.get(i));
-                        i -= 1;
-                    }
-                }
+                mRepository.deleteSelectedCrime();
                 updateUI();
                 return true;
 
@@ -230,7 +226,7 @@ public class CrimeListFragment extends Fragment {
 
     private void showSnackBar() {
         Snackbar snackbar = Snackbar.make(mFrameLayoutCrimeList, R.string.crime_dismiss_success, Snackbar.LENGTH_SHORT);
-        snackbar.setAction(R.string.crime_dismiss_undo,new MyUndoListener());
+        snackbar.setAction(R.string.crime_dismiss_undo, new MyUndoListener());
         snackbar.show();
     }
 
@@ -278,6 +274,7 @@ public class CrimeListFragment extends Fragment {
             mImageViewSolved = itemView.findViewById(R.id.imgview_solved);
             mCheckBoxSelect = itemView.findViewById(R.id.row_item_crime_checkBox);
 
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -289,7 +286,7 @@ public class CrimeListFragment extends Fragment {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     Crime crime = mRepository.getCrime(mCrime.getId());
-                    crime.setCheck_Select(isChecked);
+                    crime.setCheck_Select(isChecked ? 1 : 0);
                     mRepository.updateCrime(crime);
                 }
             });
@@ -300,7 +297,8 @@ public class CrimeListFragment extends Fragment {
             mTextViewTitle.setText(crime.getTitle());
             mTextViewDate.setText(crime.getDate().toString());
             mImageViewSolved.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
-            mCheckBoxSelect.setChecked(crime.isCheck_Select());
+            mCheckBoxSelect.setChecked(crime.getCheck_Select() == 1);
+
         }
     }
 
