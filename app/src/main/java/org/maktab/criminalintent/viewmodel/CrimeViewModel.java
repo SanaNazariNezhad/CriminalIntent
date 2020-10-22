@@ -5,11 +5,10 @@ import android.content.Context;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
-import org.maktab.criminalintent.adapter.CrimeAdapter;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
-import org.maktab.criminalintent.view.fragment.CrimeListFragment;
+
 
 public class CrimeViewModel extends BaseObservable {
 

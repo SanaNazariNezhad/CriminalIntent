@@ -63,7 +63,6 @@ public class CrimeDetailFragment extends Fragment {
 
     private FragmentCrimeDetailBinding mBinding;
     private CrimeListViewModel mCrimeListViewModel;
-    /*private IRepository mRepository;*/
     private Crime mCrime;
     private File mPhotoFile;
     private String mUsername;

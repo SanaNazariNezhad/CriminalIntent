@@ -39,7 +39,6 @@ public class CrimeListFragment extends Fragment {
     public static final String BUNDLE_ARG_IS_SUBTITLE_VISIBLE = "isSubtitleVisible";
 
     private FragmentCrimeListBinding mListBinding;
-    /*private IRepository mRepository;*/
     private CrimeListViewModel mCrimeListViewModel;
     private List<Crime> mCrimes;
     private CrimeAdapter mCrimeAdapter;
@@ -78,7 +77,6 @@ public class CrimeListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mUsername = getArguments().getString(ARG_Username);
-//        mRepository = CrimeDBRepository.getInstance(getActivity());
         mCrimeListViewModel = new CrimeListViewModel(getContext());
         mCrimeListViewModel.setCrimesUnSelected();
         setHasOptionsMenu(true);
@@ -236,7 +234,7 @@ public class CrimeListFragment extends Fragment {
             mListBinding.emptyLayout.setVisibility(View.GONE);
             mListBinding.recyclerLayout.setVisibility(View.VISIBLE);
             if (mCrimeAdapter == null) {
-                mCrimeAdapter = new CrimeAdapter(getContext(),mCrimes,mCallbacks);
+                mCrimeAdapter = new CrimeAdapter(getContext(),mCrimes);
                 mListBinding.recyclerViewCrimeList.setAdapter(mCrimeAdapter);
             } else {
                 mCrimeAdapter.setCrimes(mCrimes);
@@ -249,89 +247,6 @@ public class CrimeListFragment extends Fragment {
         }
 
     }
-
-   /* private class CrimeHolder extends RecyclerView.ViewHolder {
-
-        private TextView mTextViewTitle;
-        private TextView mTextViewDate;
-        private Crime mCrime;
-        private ImageView mImageViewSolved;
-        private CheckBox mCheckBoxSelect;
-
-        public CrimeHolder(@NonNull View itemView) {
-            super(itemView);
-
-            mTextViewTitle = itemView.findViewById(R.id.row_item_crime_title);
-            mTextViewDate = itemView.findViewById(R.id.row_item_crime_date);
-            mImageViewSolved = itemView.findViewById(R.id.imgview_solved);
-            mCheckBoxSelect = itemView.findViewById(R.id.row_item_crime_checkBox);
-
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mCallbacks.onCrimeSelected(mCrime);
-
-                }
-            });
-            mCheckBoxSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Crime crime = mRepository.getCrime(mCrime.getId());
-                    crime.setCheck_Select(isChecked ? 1 : 0);
-                    mRepository.updateCrime(crime);
-                }
-            });
-        }
-
-        public void bindCrime(Crime crime) {
-            mCrime = crime;
-            mTextViewTitle.setText(crime.getTitle());
-            mTextViewDate.setText(crime.getDate().toString());
-            mImageViewSolved.setVisibility(crime.isSolved() ? View.VISIBLE : View.GONE);
-            mCheckBoxSelect.setChecked(crime.getCheck_Select() == 1);
-
-        }
-    }*/
-
-    /*private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
-
-        private List<Crime> mCrimes;
-
-        public List<Crime> getCrimes() {
-            return mCrimes;
-        }
-
-        public void setCrimes(List<Crime> crimes) {
-            mCrimes = crimes;
-        }
-
-        public CrimeAdapter(List<Crime> crimes) {
-            mCrimes = crimes;
-        }
-
-        @Override
-        public int getItemCount() {
-            return mCrimes.size();
-        }
-
-        @NonNull
-        @Override
-        public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(R.layout.crime_row_list, parent, false);
-            CrimeHolder crimeHolder = new CrimeHolder(view);
-            return crimeHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull CrimeHolder holder, int position) {
-
-            Crime crime = mCrimes.get(position);
-            holder.bindCrime(crime);
-        }
-    }*/
 
     public interface Callbacks {
         void onCrimeSelected(Crime crime);

@@ -23,7 +23,6 @@ public class SignUpFragment extends Fragment {
     public static final String EXTRA_PASSWORD_SIGN_UP = "EXTRA_password";
    private FragmentSignUpBinding mSignUpBinding;
    private LoginViewModel mLoginViewModel;
-    /*private UserDBRepository mUserRepository;*/
 
     private static final String ARG_USERNAME = "username";
     private static final String ARG_PASSWORD = "password";

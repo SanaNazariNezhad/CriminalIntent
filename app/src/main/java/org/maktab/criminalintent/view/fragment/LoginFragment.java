@@ -31,7 +31,6 @@ public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding mLoginBinding;
     private LoginViewModel mLoginViewModel;
-    /*private UserDBRepository mUserRepository;*/
 
     public LoginFragment() {
         // Required empty public constructor
