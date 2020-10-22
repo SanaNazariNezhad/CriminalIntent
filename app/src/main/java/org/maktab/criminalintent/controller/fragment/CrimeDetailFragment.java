@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -35,6 +36,7 @@ import android.widget.ImageView;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
+import org.maktab.criminalintent.databinding.FragmentCrimeDetailBinding;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
@@ -63,17 +65,7 @@ public class CrimeDetailFragment extends Fragment {
     public static final String BUNDLE_KEY_DATE = "Date";
     public static final String BUNDLE_KEY_TIME = "Time";
 
-    private EditText mEditTextTitle;
-    private Button mButtonDate;
-    private Button mButtonTime;
-    private Button mButtonSuspect;
-    private Button mButtonReport;
-    private Button mButtonCall;
-    private Button mButtonDial;
-    private ImageButton mImageButtonTakePicture;
-    private ImageView mImageViewPhoto;
-    private ImageView mImageViewNext, mImageViewPerv, mImageViewFirst, mImageViewLast;
-    private CheckBox mCheckBoxSolved;
+    private FragmentCrimeDetailBinding mBinding;
     private IRepository mRepository;
     private Crime mCrime;
     private File mPhotoFile;
@@ -137,17 +129,20 @@ public class CrimeDetailFragment extends Fragment {
         Log.d(TAG, "onCreateView");
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_crime_detail, container, false);
+        mBinding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.fragment_crime_detail,
+                container,
+                false);
 
-        findViews(view);
         if (flag) {
-            mButtonDate.setText(mDate);
-            mButtonTime.setText(mTime);
+            mBinding.crimeDate.setText(mDate);
+            mBinding.crimeTime.setText(mTime);
         }
         initViews();
         updatePhotoView();
         setListeners();
-        return view;
+        return mBinding.getRoot();
     }
 
     @Override
@@ -216,11 +211,11 @@ public class CrimeDetailFragment extends Fragment {
             mCrime.setSuspectPhoneNumber(number);
             String dial = getString(R.string.dial_to, mCrime.getSuspectPhoneNumber() + "");
             String call = getString(R.string.call_to, mCrime.getSuspectPhoneNumber() + "");
-            mButtonCall.setText(call);
-            mButtonDial.setText(dial);
+            mBinding.callBtn.setText(call);
+            mBinding.dialBtn.setText(dial);
             String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             mCrime.setSuspect(suspect);
-            mButtonSuspect.setText(suspect);
+            mBinding.chooseSuspect.setText(suspect);
         }finally {
             cursor.close();
         }
@@ -229,48 +224,31 @@ public class CrimeDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(BUNDLE_KEY_DATE, mButtonDate.getText().toString());
-        outState.putString(BUNDLE_KEY_TIME, mButtonTime.getText().toString());
-    }
-
-    private void findViews(View view) {
-        mEditTextTitle = view.findViewById(R.id.crime_title);
-        mButtonDate = view.findViewById(R.id.crime_date);
-        mButtonTime = view.findViewById(R.id.crime_time);
-        mButtonSuspect = view.findViewById(R.id.choose_suspect);
-        mButtonReport = view.findViewById(R.id.send_report);
-        mButtonCall = view.findViewById(R.id.call_btn);
-        mButtonDial = view.findViewById(R.id.dial_btn);
-        mImageViewPhoto = view.findViewById(R.id.imgview_photo);
-        mImageButtonTakePicture = view.findViewById(R.id.imgbtn_take_picture);
-        mCheckBoxSolved = view.findViewById(R.id.crime_solved);
-        mImageViewNext = view.findViewById(R.id.imgBtn_next);
-        mImageViewPerv = view.findViewById(R.id.imgBtn_Prev);
-        mImageViewFirst = view.findViewById(R.id.imgBtn_first);
-        mImageViewLast = view.findViewById(R.id.imgBtn_last);
+        outState.putString(BUNDLE_KEY_DATE, mBinding.crimeDate.getText().toString());
+        outState.putString(BUNDLE_KEY_TIME, mBinding.crimeTime.getText().toString());
     }
 
     private void initViews() {
-        mEditTextTitle.setText(mCrime.getTitle());
-        mCheckBoxSolved.setChecked(mCrime.isSolved());
+        mBinding.title.setText(mCrime.getTitle());
+        mBinding.crimeSolved.setChecked(mCrime.isSolved());
         if (!flag) {
             DateFormat dateFormat = getDateFormat();
-            mButtonDate.setText(dateFormat.format(mCrime.getDate()));
+            mBinding.crimeDate.setText(dateFormat.format(mCrime.getDate()));
             DateFormat timeFormat = getTimeFormat();
-            mButtonTime.setText(timeFormat.format(mCrime.getDate()));
+            mBinding.crimeTime.setText(timeFormat.format(mCrime.getDate()));
         }
 
         if (mCrime.getSuspect() != null) {
-            mButtonSuspect.setText(mCrime.getSuspect());
+            mBinding.chooseSuspect.setText(mCrime.getSuspect());
             String dial = getString(R.string.dial_to, mCrime.getSuspectPhoneNumber() + "");
             String call = getString(R.string.call_to, mCrime.getSuspectPhoneNumber() + "");
-            mButtonCall.setText(call);
-            mButtonDial.setText(dial);
+            mBinding.callBtn.setText(call);
+            mBinding.dialBtn.setText(dial);
         }
     }
 
     private void setListeners() {
-        mEditTextTitle.addTextChangedListener(new TextWatcher() {
+        mBinding.crimeTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -289,7 +267,7 @@ public class CrimeDetailFragment extends Fragment {
             }
         });
 
-        mCheckBoxSolved.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mBinding.crimeSolved.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -298,7 +276,7 @@ public class CrimeDetailFragment extends Fragment {
             }
         });
 
-        mButtonDate.setOnClickListener(new View.OnClickListener() {
+        mBinding.crimeDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerFragment datePickerFragment =
@@ -314,7 +292,7 @@ public class CrimeDetailFragment extends Fragment {
                         FRAGMENT_TAG_DATE_PICKER);
             }
         });
-        mButtonTime.setOnClickListener(new View.OnClickListener() {
+        mBinding.crimeTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mCrime.getDate());
@@ -328,7 +306,7 @@ public class CrimeDetailFragment extends Fragment {
             }
         });
 
-        mImageViewNext.setOnClickListener(new View.OnClickListener() {
+        mBinding.imgBtnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
@@ -339,7 +317,7 @@ public class CrimeDetailFragment extends Fragment {
 //                initViews();
             }
         });
-        mImageViewPerv.setOnClickListener(new View.OnClickListener() {
+        mBinding.imgBtnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
@@ -350,7 +328,7 @@ public class CrimeDetailFragment extends Fragment {
 //                initViews();
             }
         });
-        mImageViewFirst.setOnClickListener(new View.OnClickListener() {
+        mBinding.imgBtnFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = 0;
@@ -360,7 +338,7 @@ public class CrimeDetailFragment extends Fragment {
 //                initViews();
             }
         });
-        mImageViewLast.setOnClickListener(new View.OnClickListener() {
+        mBinding.imgBtnLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = mRepository.repositorySize() - 1;
@@ -370,20 +348,20 @@ public class CrimeDetailFragment extends Fragment {
 //                initViews();
             }
         });
-        mButtonSuspect.setOnClickListener(new View.OnClickListener() {
+        mBinding.chooseSuspect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectContact();
             }
         });
 
-        mButtonReport.setOnClickListener(new View.OnClickListener() {
+        mBinding.sendReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 shareReportIntent();
             }
         });
-        mButtonCall.setOnClickListener(new View.OnClickListener() {
+        mBinding.callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -391,7 +369,7 @@ public class CrimeDetailFragment extends Fragment {
                 startActivity(callIntent);
             }
         });
-        mButtonDial.setOnClickListener(new View.OnClickListener() {
+        mBinding.dialBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent dialIntent = new Intent(Intent.ACTION_DIAL);
@@ -400,7 +378,7 @@ public class CrimeDetailFragment extends Fragment {
             }
         });
 
-        mImageButtonTakePicture.setOnClickListener(new View.OnClickListener() {
+        mBinding.imgbtnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 takePictureIntent();
@@ -421,14 +399,14 @@ public class CrimeDetailFragment extends Fragment {
         mCrime.setDate(userSelectedDate);
         updateCrime();
         DateFormat dateFormat = getDateFormat();
-        mButtonDate.setText(dateFormat.format(mCrime.getDate()));
+        mBinding.crimeDate.setText(dateFormat.format(mCrime.getDate()));
     }
 
     private void updateCrimeTime(Date userSelectedTime) {
         mCrime.setDate(userSelectedTime);
         updateCrime();
         DateFormat timeFormat = getTimeFormat();
-        mButtonTime.setText(timeFormat.format(mCrime.getDate()));
+        mBinding.crimeTime.setText(timeFormat.format(mCrime.getDate()));
     }
 
     private DateFormat getDateFormat() {
@@ -535,7 +513,7 @@ public class CrimeDetailFragment extends Fragment {
 
         //this has a better memory management.
         Bitmap bitmap = com.example.criminalintent.utils.PictureUtils.getScaledBitmap(mPhotoFile.getAbsolutePath(), getActivity());
-        mImageViewPhoto.setImageBitmap(bitmap);
+        mBinding.imgviewPhoto.setImageBitmap(bitmap);
     }
 
     public interface Callbacks {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import org.maktab.criminalintent.R;
+import org.maktab.criminalintent.databinding.CostumeDatePickerFragmentBinding;
+import org.maktab.criminalintent.databinding.FragmentDatePickerBinding;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -23,8 +27,7 @@ public class DatePickerFragment extends DialogFragment {
     public static final String BUNDLE_KEY_CRIME_DATE = "bundle_key_CrimeDate";
     private Date mCrimeDate;
 
-    private DatePicker mDatePicker;
-    private Button mButtonOk, mButtonCancel;
+    private CostumeDatePickerFragmentBinding mDatePickerBinding;
     private Calendar mCalendar;
 
     public DatePickerFragment() {
@@ -55,17 +58,20 @@ public class DatePickerFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.costume_date_picker_fragment, container, false);
+        mDatePickerBinding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.costume_date_picker_fragment,
+                container,
+                false);
 
-        findViews(view);
         initViews();
 
         listeners();
-        return view;
+        return mDatePickerBinding.getRoot();
     }
 
     private void listeners() {
-        mButtonOk.setOnClickListener(new View.OnClickListener() {
+        mDatePickerBinding.btnOkDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 extractDateFromDatePicker();
@@ -73,7 +79,7 @@ public class DatePickerFragment extends DialogFragment {
                 dismiss();
             }
         });
-        mButtonCancel.setOnClickListener(new View.OnClickListener() {
+        mDatePickerBinding.btnCancelDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
@@ -89,12 +95,6 @@ public class DatePickerFragment extends DialogFragment {
         outState.putSerializable(BUNDLE_KEY_CRIME_DATE, mCalendar);
     }
 
-    private void findViews(View view) {
-        mDatePicker = view.findViewById(R.id.date_picker_crime);
-        mButtonOk = view.findViewById(R.id.btn_ok_date);
-        mButtonCancel = view.findViewById(R.id.btn_cancel_date);
-    }
-
     private void initViews() {
         initDatePicker();
     }
@@ -105,13 +105,13 @@ public class DatePickerFragment extends DialogFragment {
         int year = mCalendar.get(Calendar.YEAR);
         int monthOfYear = mCalendar.get(Calendar.MONTH);
         int dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
-        mDatePicker.init(year, monthOfYear, dayOfMonth, null);
+        mDatePickerBinding.datePickerCrime.init(year, monthOfYear, dayOfMonth, null);
     }
 
     private void extractDateFromDatePicker() {
-        int year = mDatePicker.getYear();
-        int month = mDatePicker.getMonth();
-        int dayOfMonth = mDatePicker.getDayOfMonth();
+        int year = mDatePickerBinding.datePickerCrime.getYear();
+        int month = mDatePickerBinding.datePickerCrime.getMonth();
+        int dayOfMonth = mDatePickerBinding.datePickerCrime.getDayOfMonth();
 
         mCalendar.set(Calendar.YEAR,year);
         mCalendar.set(Calendar.MONTH,month);

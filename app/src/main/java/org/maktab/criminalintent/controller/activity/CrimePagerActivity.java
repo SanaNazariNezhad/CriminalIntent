@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -15,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
+import org.maktab.criminalintent.databinding.ActivityCrimePagerBinding;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
@@ -32,7 +34,7 @@ public class CrimePagerActivity extends AppCompatActivity implements
     private IRepository mRepository;
     private UUID mCrimeId;
     private String mUsername;
-    private ViewPager2 mViewPagerCrimes;
+    private ActivityCrimePagerBinding mPagerBinding;
 
     public static Intent newIntent(Context context, UUID crimeId, String username) {
         Intent intent = new Intent(context, CrimePagerActivity.class);
@@ -44,18 +46,17 @@ public class CrimePagerActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crime_pager);
+        mPagerBinding= DataBindingUtil.setContentView(this,R.layout.activity_crime_pager);
         mRepository = CrimeDBRepository.getInstance(this);
         mCrimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
         mUsername = getIntent().getStringExtra(EXTRA_Username);
-        findViews();
         initViews();
 //        circleViewPager();
 
     }
 
     private void circleViewPager() {
-        mViewPagerCrimes.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        mPagerBinding.viewPagerCrimes.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             int currentPage;
 
             @Override
@@ -70,26 +71,22 @@ public class CrimePagerActivity extends AppCompatActivity implements
                     int pageCount = crimes.size();
 
                     if (currentPage == 0) {
-                        mViewPagerCrimes.setCurrentItem(pageCount - 2, false);
+                        mPagerBinding.viewPagerCrimes.setCurrentItem(pageCount - 2, false);
                     } else if (currentPage == pageCount - 1) {
-                        mViewPagerCrimes.setCurrentItem(1, false);
+                        mPagerBinding.viewPagerCrimes.setCurrentItem(1, false);
                     }
                 }
             }
         });
     }
 
-    private void findViews() {
-        mViewPagerCrimes = findViewById(R.id.view_pager_crimes);
-    }
-
     private void initViews() {
         List<Crime> crimes = mRepository.getCrimes();
         CrimePagerAdapter adapter = new CrimePagerAdapter(this, crimes);
-        mViewPagerCrimes.setAdapter(adapter);
+        mPagerBinding.viewPagerCrimes.setAdapter(adapter);
         CURRENT_INDEX = mRepository.getPosition(mCrimeId);
-        mViewPagerCrimes.setCurrentItem(CURRENT_INDEX);
-        mViewPagerCrimes.setPageTransformer(new ZoomOutPageTransformer());
+        mPagerBinding.viewPagerCrimes.setCurrentItem(CURRENT_INDEX);
+        mPagerBinding.viewPagerCrimes.setPageTransformer(new ZoomOutPageTransformer());
     }
 
     @Override

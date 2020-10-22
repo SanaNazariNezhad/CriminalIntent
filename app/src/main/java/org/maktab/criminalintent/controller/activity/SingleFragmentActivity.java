@@ -2,17 +2,22 @@ package org.maktab.criminalintent.controller.activity;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import org.maktab.criminalintent.R;
+import org.maktab.criminalintent.databinding.ActivityFragmentBinding;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
+
+    private ActivityFragmentBinding mBinding;
 
     public abstract Fragment createFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_master_detail);
+
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_fragment);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 

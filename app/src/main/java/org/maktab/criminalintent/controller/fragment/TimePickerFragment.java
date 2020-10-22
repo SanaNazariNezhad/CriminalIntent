@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TimePicker;
 import org.maktab.criminalintent.R;
+import org.maktab.criminalintent.databinding.CostumeTimerPickerFragmentBinding;
+
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,8 +27,7 @@ public class TimePickerFragment extends DialogFragment {
     public static final String BUNDLE_KEY_CRIME_DATE = "bundle_key_CrimeDate";
     private Date mCrimeDate;
 
-    private TimePicker mTimePicker;
-    private Button mButtonOk, mButtonCancel;
+    private CostumeTimerPickerFragmentBinding mTimerPickerFragmentBinding;
     private Calendar mCalendar;
 
     public TimePickerFragment() {
@@ -55,13 +57,16 @@ public class TimePickerFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.costume_timer_picker_fragment, container, false);
+        mTimerPickerFragmentBinding = DataBindingUtil.inflate(inflater,
+                R.layout.costume_timer_picker_fragment,
+                container,
+                false);
 
-        findViews(view);
+
         initViews();
 
         listeners();
-        return view;
+        return mTimerPickerFragmentBinding.getRoot();
     }
 
     @Override
@@ -73,7 +78,7 @@ public class TimePickerFragment extends DialogFragment {
     }
 
     private void listeners() {
-        mButtonOk.setOnClickListener(new View.OnClickListener() {
+        mTimerPickerFragmentBinding.btnOkTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 extractTimeFromTimePicker();
@@ -81,18 +86,12 @@ public class TimePickerFragment extends DialogFragment {
                 dismiss();
             }
         });
-        mButtonCancel.setOnClickListener(new View.OnClickListener() {
+        mTimerPickerFragmentBinding.btnCancelTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
             }
         });
-    }
-
-    private void findViews(View view) {
-        mTimePicker = view.findViewById(R.id.time_picker_crime);
-        mButtonOk = view.findViewById(R.id.btn_ok_time);
-        mButtonCancel = view.findViewById(R.id.btn_cancel_time);
     }
 
     private void initViews() {
@@ -106,16 +105,16 @@ public class TimePickerFragment extends DialogFragment {
         mCalendar.setTime(mCrimeDate);
         int hour = mCalendar.get(Calendar.HOUR);
         int minute = mCalendar.get(Calendar.MINUTE);
-        mTimePicker.setHour(hour);
-        mTimePicker.setMinute(minute);
+        mTimerPickerFragmentBinding.timePickerCrime.setHour(hour);
+        mTimerPickerFragmentBinding.timePickerCrime.setMinute(minute);
 
 
     }
 
     private void extractTimeFromTimePicker() {
         LocalDateTime now = LocalDateTime.now();
-        int hour = mTimePicker.getHour();
-        int minute = mTimePicker.getMinute();
+        int hour = mTimerPickerFragmentBinding.timePickerCrime.getHour();
+        int minute = mTimerPickerFragmentBinding.timePickerCrime.getMinute();
         int second = now.getSecond();
 
         mCalendar.set(Calendar.HOUR_OF_DAY, hour);

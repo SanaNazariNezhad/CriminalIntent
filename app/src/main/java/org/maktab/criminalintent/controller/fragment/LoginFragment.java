@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.controller.activity.CrimeListActivity;
 import org.maktab.criminalintent.controller.activity.SignUpActivity;
+import org.maktab.criminalintent.databinding.FragmentLoginBinding;
 import org.maktab.criminalintent.model.User;
 import org.maktab.criminalintent.repository.UserDBRepository;
 import java.util.Objects;
@@ -23,13 +25,10 @@ import java.util.Objects;
 public class LoginFragment extends Fragment {
     public static final String BUNDLE_KEY_USERNAME = "UserBundle";
     public static final String BUNDLE_KEY_PASSWORD = "passBundle";
-    private Button mButtonLogin, mButtonSignUp;
     public static final int REQUEST_CODE_SIGN_UP = 0;
     private String username, password;
-    private TextInputLayout mUsernameForm;
-    private TextInputLayout mPasswordForm;
-    private TextInputEditText mUsername;
-    private TextInputEditText mPassword;
+
+    private FragmentLoginBinding mLoginBinding;
     private UserDBRepository mUserRepository;
 
     public LoginFragment() {
@@ -57,10 +56,13 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
-        findViews(view);
+        mLoginBinding = DataBindingUtil.inflate(inflater,
+                R.layout.fragment_login,
+                container,
+                false );
+
         listeners();
-        return view;
+        return mLoginBinding.getRoot();
     }
 
     @Override
@@ -79,27 +81,30 @@ public class LoginFragment extends Fragment {
         if (requestCode == REQUEST_CODE_SIGN_UP) {
             username = data.getStringExtra(SignUpFragment.EXTRA_USERNAME_SIGN_UP);
             password = data.getStringExtra(SignUpFragment.EXTRA_PASSWORD_SIGN_UP);
-            mUsername.setText(username);
-            mPassword.setText(password);
+            mLoginBinding.usernameLogin.setText(username);
+            mLoginBinding.passwordLogin.setText(password);
         }
     }
 
     private void listeners() {
-        mButtonLogin.setOnClickListener(new View.OnClickListener() {
+        mLoginBinding.btnLoginLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mUsernameForm.setErrorEnabled(false);
-                mPasswordForm.setErrorEnabled(false);
+                mLoginBinding.usernameFormLogin.setErrorEnabled(false);
+                mLoginBinding.passwordFormLogin.setErrorEnabled(false);
                 if (validateInput()) {
-                    Intent intent = CrimeListActivity.newIntent(getActivity(),mUsername.getText().toString());
+                    Intent intent = CrimeListActivity.newIntent(getActivity(),
+                            mLoginBinding.usernameLogin.getText().toString());
                     startActivity(intent);
                 }
             }
         });
-        mButtonSignUp.setOnClickListener(new View.OnClickListener() {
+        mLoginBinding.btnSignUpLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = SignUpActivity.newIntent(getActivity(), mUsername.getText().toString(), mPassword.getText().toString());
+                Intent intent = SignUpActivity.newIntent(getActivity(),
+                        mLoginBinding.usernameLogin.getText().toString(),
+                        mLoginBinding.passwordLogin.getText().toString());
                 startActivityForResult(intent, REQUEST_CODE_SIGN_UP);
 
             }
@@ -108,20 +113,20 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean validateInput() {
-        User user = mUserRepository.getUser(Objects.requireNonNull(mUsername.getText()).toString());
-        if (mUsername.getText().toString().trim().isEmpty() && mPassword.getText().toString().trim().isEmpty()) {
-            mUsernameForm.setErrorEnabled(true);
-            mUsernameForm.setError("Field cannot be empty!");
-            mPasswordForm.setErrorEnabled(true);
-            mPasswordForm.setError("Field cannot be empty!");
+        User user = mUserRepository.getUser(Objects.requireNonNull( mLoginBinding.usernameLogin.getText()).toString());
+        if ( mLoginBinding.usernameLogin.getText().toString().trim().isEmpty() && mLoginBinding.passwordLogin.getText().toString().trim().isEmpty()) {
+            mLoginBinding.usernameFormLogin.setErrorEnabled(true);
+            mLoginBinding.usernameFormLogin.setError("Field cannot be empty!");
+            mLoginBinding.passwordFormLogin.setErrorEnabled(true);
+            mLoginBinding.passwordFormLogin.setError("Field cannot be empty!");
             return false;
-        } else if (mUsername.getText().toString().trim().isEmpty()) {
-            mUsernameForm.setErrorEnabled(true);
-            mUsernameForm.setError("Field cannot be empty!");
+        } else if ( mLoginBinding.usernameLogin.getText().toString().trim().isEmpty()) {
+            mLoginBinding.usernameFormLogin.setErrorEnabled(true);
+            mLoginBinding.usernameFormLogin.setError("Field cannot be empty!");
             return false;
-        } else if (mPassword.getText().toString().trim().isEmpty()) {
-            mPasswordForm.setErrorEnabled(true);
-            mPasswordForm.setError("Field cannot be empty!");
+        } else if (mLoginBinding.passwordLogin.getText().toString().trim().isEmpty()) {
+            mLoginBinding.passwordFormLogin.setErrorEnabled(true);
+            mLoginBinding.passwordFormLogin.setError("Field cannot be empty!");
             return false;
         }
         if (user == null){
@@ -130,24 +135,15 @@ public class LoginFragment extends Fragment {
         }else {
             String inputUsername = user.getUsername();
             String inputPassword = user.getPassword();
-            if (!mUsername.getText().toString().equals(inputUsername) ||
-                    !mPassword.getText().toString().equals(inputPassword)) {
+            if (! mLoginBinding.usernameLogin.getText().toString().equals(inputUsername) ||
+                    !mLoginBinding.passwordLogin.getText().toString().equals(inputPassword)) {
                 callToast(R.string.toast_login);
                 return false;
             }
         }
-        mUsernameForm.setErrorEnabled(false);
-        mPasswordForm.setErrorEnabled(false);
+        mLoginBinding.usernameFormLogin.setErrorEnabled(false);
+        mLoginBinding.passwordFormLogin.setErrorEnabled(false);
         return true;
-    }
-
-    private void findViews(View view) {
-        mButtonLogin = view.findViewById(R.id.btnLogin_Login);
-        mButtonSignUp = view.findViewById(R.id.btnSignUp_Login);
-        mUsernameForm = view.findViewById(R.id.username_form_login);
-        mPasswordForm = view.findViewById(R.id.password_form_login);
-        mUsername = view.findViewById(R.id.username_login);
-        mPassword = view.findViewById(R.id.password_login);
     }
 
     private void callToast(int stringId) {
