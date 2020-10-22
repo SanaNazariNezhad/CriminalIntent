@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".controller.fragment.SignUpFragment">
+        tools:context=".view.fragment.SignUpFragment">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

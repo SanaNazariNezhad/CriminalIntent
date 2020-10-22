@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.activity;
+package org.maktab.criminalintent.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
+import org.maktab.criminalintent.view.fragment.CrimeDetailFragment;
 import org.maktab.criminalintent.databinding.ActivityCrimePagerBinding;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;

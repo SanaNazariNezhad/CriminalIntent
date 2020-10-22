@@ -10,7 +10,7 @@
         android:id="@+id/date_picker_crime"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".controller.fragment.DatePickerFragment">
+        tools:context=".view.fragment.DatePickerFragment">
 
     </DatePicker>
 </layout>

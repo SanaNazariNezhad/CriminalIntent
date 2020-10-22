@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.fragment;
+package org.maktab.criminalintent.view.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,22 +16,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.SwipeableRecyclerView;
+import org.maktab.criminalintent.adapter.CrimeAdapter;
 import org.maktab.criminalintent.databinding.FragmentCrimeListBinding;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
+import org.maktab.criminalintent.viewmodel.CrimeListViewModel;
 
 import java.util.List;
 
@@ -41,7 +39,8 @@ public class CrimeListFragment extends Fragment {
     public static final String BUNDLE_ARG_IS_SUBTITLE_VISIBLE = "isSubtitleVisible";
 
     private FragmentCrimeListBinding mListBinding;
-    private IRepository mRepository;
+    /*private IRepository mRepository;*/
+    private CrimeListViewModel mCrimeListViewModel;
     private List<Crime> mCrimes;
     private CrimeAdapter mCrimeAdapter;
     private boolean mIsSubtitleVisible = true;
@@ -79,8 +78,9 @@ public class CrimeListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mUsername = getArguments().getString(ARG_Username);
-        mRepository = CrimeDBRepository.getInstance(getActivity());
-        mRepository.setCrimesUnSelected();
+//        mRepository = CrimeDBRepository.getInstance(getActivity());
+        mCrimeListViewModel = new CrimeListViewModel(getContext());
+        mCrimeListViewModel.setCrimesUnSelected();
         setHasOptionsMenu(true);
         if (savedInstanceState != null)
             mIsSubtitleVisible =
@@ -107,7 +107,7 @@ public class CrimeListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Crime crime = new Crime();
-                mRepository.insertCrime(crime);
+                mCrimeListViewModel.insertCrime(crime);
                 mCallbacks.onCrimeSelected(crime);
                 updateUI();
             }
@@ -127,7 +127,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_add_crime:
                 Crime crime = new Crime();
-                mRepository.insertCrime(crime);
+                mCrimeListViewModel.insertCrime(crime);
                 mCallbacks.onCrimeSelected(crime);
                 updateUI();
                 return true;
@@ -139,17 +139,17 @@ public class CrimeListFragment extends Fragment {
                 return true;
 
             case R.id.menu_item_remove_selected_crime:
-                mRepository.deleteSelectedCrime();
+                mCrimeListViewModel.deleteSelectedCrime();
                 updateUI();
                 return true;
 
             case R.id.menu_item_selectAll_crime:
-                mRepository.setCrimesSelected();
+                mCrimeListViewModel.setCrimesSelected();
                 updateUI();
                 return true;
 
             case R.id.menu_item_unSelectAll_crime:
-                mRepository.setCrimesUnSelected();
+                mCrimeListViewModel.setCrimesUnSelected();
                 updateUI();
                 return true;
 
@@ -218,7 +218,7 @@ public class CrimeListFragment extends Fragment {
     private void onRecyclerViewDismiss(int[] reverseSortedPositions, List<Crime> crimes) {
         for (int position : reverseSortedPositions) {
             mCrimeUndo = crimes.get(position);
-            mRepository.deleteCrime(crimes.get(position));
+            mCrimeListViewModel.deleteCrime(crimes.get(position));
         }
         updateUI();
         showSnackBar();
@@ -231,12 +231,12 @@ public class CrimeListFragment extends Fragment {
     }
 
     public void updateUI() {
-        mCrimes = mRepository.getCrimes();
+        mCrimes = mCrimeListViewModel.getCrimes();
         if (mCrimes.size() != 0) {
             mListBinding.emptyLayout.setVisibility(View.GONE);
             mListBinding.recyclerLayout.setVisibility(View.VISIBLE);
             if (mCrimeAdapter == null) {
-                mCrimeAdapter = new CrimeAdapter(mCrimes);
+                mCrimeAdapter = new CrimeAdapter(getContext(),mCrimes,mCallbacks);
                 mListBinding.recyclerViewCrimeList.setAdapter(mCrimeAdapter);
             } else {
                 mCrimeAdapter.setCrimes(mCrimes);
@@ -250,7 +250,7 @@ public class CrimeListFragment extends Fragment {
 
     }
 
-    private class CrimeHolder extends RecyclerView.ViewHolder {
+   /* private class CrimeHolder extends RecyclerView.ViewHolder {
 
         private TextView mTextViewTitle;
         private TextView mTextViewDate;
@@ -292,9 +292,9 @@ public class CrimeListFragment extends Fragment {
             mCheckBoxSelect.setChecked(crime.getCheck_Select() == 1);
 
         }
-    }
+    }*/
 
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
+    /*private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
         private List<Crime> mCrimes;
 
@@ -331,7 +331,7 @@ public class CrimeListFragment extends Fragment {
             Crime crime = mCrimes.get(position);
             holder.bindCrime(crime);
         }
-    }
+    }*/
 
     public interface Callbacks {
         void onCrimeSelected(Crime crime);
@@ -341,7 +341,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            mRepository.insertCrime(mCrimeUndo);
+            mCrimeListViewModel.insertCrime(mCrimeUndo);
             updateUI();
         }
     }

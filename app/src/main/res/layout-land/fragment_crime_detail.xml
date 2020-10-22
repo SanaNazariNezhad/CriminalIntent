@@ -12,7 +12,7 @@
         android:layout_margin="16dp"
         android:orientation="vertical"
         android:padding="8dp"
-        tools:context=".controller.fragment.CrimeDetailFragment">
+        tools:context=".view.fragment.CrimeDetailFragment">
 
         <TextView
             style="@style/TextAppearance.AppCompat.Title"

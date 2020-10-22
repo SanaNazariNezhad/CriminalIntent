@@ -15,17 +15,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controller.activity.SignUpActivity" />
-        <activity android:name=".controller.activity.LoginActivity">
+        <activity android:name=".view.activity.SignUpActivity" />
+        <activity android:name=".view.activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".controller.activity.CrimePagerActivity"
-            android:parentActivityName=".controller.activity.CrimeListActivity"/>
-        <activity android:name=".controller.activity.CrimeListActivity" />
+        <activity android:name=".view.activity.CrimePagerActivity"
+            android:parentActivityName=".view.activity.CrimeListActivity"/>
+        <activity android:name=".view.activity.CrimeListActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="org.maktab.criminalintent.fileProvider"

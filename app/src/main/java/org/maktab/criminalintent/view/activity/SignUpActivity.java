@@ -1,9 +1,9 @@
-package org.maktab.criminalintent.controller.activity;
+package org.maktab.criminalintent.view.activity;
 
 import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import org.maktab.criminalintent.controller.fragment.SignUpFragment;
+import org.maktab.criminalintent.view.fragment.SignUpFragment;
 
 public class SignUpActivity extends SingleFragmentActivity {
 

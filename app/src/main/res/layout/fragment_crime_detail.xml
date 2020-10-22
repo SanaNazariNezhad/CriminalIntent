@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:background="@color/background"
         android:padding="8dp"
-        tools:context=".controller.fragment.CrimeDetailFragment">
+        tools:context=".view.fragment.CrimeDetailFragment">
 
         <TextView
             style="@style/TextAppearance.AppCompat.Title"

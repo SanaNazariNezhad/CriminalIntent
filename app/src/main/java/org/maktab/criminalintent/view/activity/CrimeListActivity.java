@@ -1,16 +1,18 @@
-package org.maktab.criminalintent.controller.activity;
+package org.maktab.criminalintent.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
 import androidx.fragment.app.Fragment;
 
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.fragment.CrimeDetailFragment;
-import org.maktab.criminalintent.controller.fragment.CrimeListFragment;
+import org.maktab.criminalintent.adapter.CrimeAdapter;
+import org.maktab.criminalintent.view.fragment.CrimeDetailFragment;
+import org.maktab.criminalintent.view.fragment.CrimeListFragment;
 import org.maktab.criminalintent.model.Crime;
+import org.maktab.criminalintent.viewmodel.CrimeViewModel;
 
 public class CrimeListActivity extends SingleFragmentActivity implements
-        CrimeListFragment.Callbacks, CrimeDetailFragment.Callbacks{
+        CrimeListFragment.Callbacks, CrimeDetailFragment.Callbacks, CrimeViewModel.Callbacks {
 
     public static final String EXTRA_USERNAME = "org.maktab.criminalintent.controller.activity.extra_username";
     private static String mUsername;

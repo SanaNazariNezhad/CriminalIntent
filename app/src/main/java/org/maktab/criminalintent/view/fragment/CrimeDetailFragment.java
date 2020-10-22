@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.fragment;
+package org.maktab.criminalintent.view.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -27,20 +27,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.activity.CrimeListActivity;
-import org.maktab.criminalintent.controller.activity.CrimePagerActivity;
+import org.maktab.criminalintent.view.activity.CrimeListActivity;
+import org.maktab.criminalintent.view.activity.CrimePagerActivity;
 import org.maktab.criminalintent.databinding.FragmentCrimeDetailBinding;
 import org.maktab.criminalintent.model.Crime;
 import org.maktab.criminalintent.repository.CrimeDBRepository;
 import org.maktab.criminalintent.repository.IRepository;
-import com.example.criminalintent.utils.PictureUtils;
+import org.maktab.criminalintent.viewmodel.CrimeListViewModel;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -66,7 +62,8 @@ public class CrimeDetailFragment extends Fragment {
     public static final String BUNDLE_KEY_TIME = "Time";
 
     private FragmentCrimeDetailBinding mBinding;
-    private IRepository mRepository;
+    private CrimeListViewModel mCrimeListViewModel;
+    /*private IRepository mRepository;*/
     private Crime mCrime;
     private File mPhotoFile;
     private String mUsername;
@@ -114,11 +111,11 @@ public class CrimeDetailFragment extends Fragment {
         }
 
         Log.d(TAG, "onCreate");
-        mRepository = CrimeDBRepository.getInstance(getActivity());
+        mCrimeListViewModel = new CrimeListViewModel(getContext());
         UUID crimeId = (UUID) getArguments().getSerializable(ARGUMENT_CRIME_ID);
         mUsername = getArguments().getString(ARGUMENT_USERNAME);
-        mCrime = mRepository.getCrime(crimeId);
-        mPhotoFile = mRepository.getPhotoFile(mCrime);
+        mCrime = mCrimeListViewModel.getCrime(crimeId);
+        mPhotoFile = mCrimeListViewModel.getPhotoFile(mCrime);
         setHasOptionsMenu(true);
 
     }
@@ -160,7 +157,7 @@ public class CrimeDetailFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_delete_crime:
-                mRepository.deleteCrime(mCrime);
+                mCrimeListViewModel.deleteCrime(mCrime);
                 mFlagRemove = true;
                 Intent intent = CrimeListActivity.newIntent(getActivity(), mUsername);
                 startActivity(intent);
@@ -309,9 +306,9 @@ public class CrimeDetailFragment extends Fragment {
         mBinding.imgBtnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
-                mCurrentIndex = (mCurrentIndex + 1) % mRepository.repositorySize();
-                mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
+                mCurrentIndex = mCrimeListViewModel.getIndexOfCrime(mCrime);
+                mCurrentIndex = (mCurrentIndex + 1) % mCrimeListViewModel.repositorySize();
+                mCrime = mCrimeListViewModel.getCrimeWithIndex(mCurrentIndex);
                 Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
                 startActivity(crimePagerActivityIntent);
 //                initViews();
@@ -320,9 +317,9 @@ public class CrimeDetailFragment extends Fragment {
         mBinding.imgBtnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex = mRepository.getIndexOfCrime(mCrime);
-                mCurrentIndex = (mCurrentIndex - 1 + mRepository.repositorySize()) % mRepository.repositorySize();
-                mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
+                mCurrentIndex = mCrimeListViewModel.getIndexOfCrime(mCrime);
+                mCurrentIndex = (mCurrentIndex - 1 + mCrimeListViewModel.repositorySize()) % mCrimeListViewModel.repositorySize();
+                mCrime = mCrimeListViewModel.getCrimeWithIndex(mCurrentIndex);
                 Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
                 startActivity(crimePagerActivityIntent);
 //                initViews();
@@ -332,7 +329,7 @@ public class CrimeDetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = 0;
-                mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
+                mCrime = mCrimeListViewModel.getCrimeWithIndex(mCurrentIndex);
                 Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
                 startActivity(crimePagerActivityIntent);
 //                initViews();
@@ -341,8 +338,8 @@ public class CrimeDetailFragment extends Fragment {
         mBinding.imgBtnLast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex = mRepository.repositorySize() - 1;
-                mCrime = mRepository.getCrimeWithIndex(mCurrentIndex);
+                mCurrentIndex = mCrimeListViewModel.repositorySize() - 1;
+                mCrime = mCrimeListViewModel.getCrimeWithIndex(mCurrentIndex);
                 Intent crimePagerActivityIntent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId(),mUsername);
                 startActivity(crimePagerActivityIntent);
 //                initViews();
@@ -388,9 +385,8 @@ public class CrimeDetailFragment extends Fragment {
 
     private void updateCrime() {
         if (!mFlagRemove) {
-            mRepository.updateCrime(mCrime);
+            mCrimeListViewModel.updateCrime(mCrime);
 
-            //todo: anti pattern
             mCallbacks.onCrimeUpdated(mCrime);
         }
     }

@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.fragment;
+package org.maktab.criminalintent.view.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,11 +11,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
+
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.databinding.CostumeDatePickerFragmentBinding;
-import org.maktab.criminalintent.databinding.FragmentDatePickerBinding;
 
 import java.util.Calendar;
 import java.util.Date;

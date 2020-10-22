@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller;
+package org.maktab.criminalintent.view.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

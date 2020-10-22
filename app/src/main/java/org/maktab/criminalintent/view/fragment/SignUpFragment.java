@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.fragment;
+package org.maktab.criminalintent.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+
 import org.maktab.criminalintent.R;
 import org.maktab.criminalintent.databinding.FragmentSignUpBinding;
 import org.maktab.criminalintent.model.User;
 import org.maktab.criminalintent.repository.UserDBRepository;
+import org.maktab.criminalintent.viewmodel.LoginViewModel;
+
 import java.util.Objects;
 
 public class SignUpFragment extends Fragment {
@@ -22,7 +22,8 @@ public class SignUpFragment extends Fragment {
     public static final String EXTRA_USERNAME_SIGN_UP = "extraUsername";
     public static final String EXTRA_PASSWORD_SIGN_UP = "EXTRA_password";
    private FragmentSignUpBinding mSignUpBinding;
-    private UserDBRepository mUserRepository;
+   private LoginViewModel mLoginViewModel;
+    /*private UserDBRepository mUserRepository;*/
 
     private static final String ARG_USERNAME = "username";
     private static final String ARG_PASSWORD = "password";
@@ -49,7 +50,7 @@ public class SignUpFragment extends Fragment {
 
         mUser = getArguments().getString(ARG_USERNAME);
         mPass = getArguments().getString(ARG_PASSWORD);
-        mUserRepository = UserDBRepository.getInstance(getActivity());
+        mLoginViewModel = new LoginViewModel(getContext());
 
     }
 
@@ -88,7 +89,7 @@ public class SignUpFragment extends Fragment {
         String username = Objects.requireNonNull(mSignUpBinding.usernameSignUp.getText()).toString();
         String password = Objects.requireNonNull(mSignUpBinding.passwordSignUp.getText()).toString();
         User user = new User(username,password);
-        mUserRepository.insertUser(user);
+        mLoginViewModel.insertUser(user);
         Intent intent = new Intent();
         intent.putExtra(EXTRA_USERNAME_SIGN_UP, mSignUpBinding.usernameSignUp.getText().toString());
         intent.putExtra(EXTRA_PASSWORD_SIGN_UP, mSignUpBinding.passwordSignUp.getText().toString());

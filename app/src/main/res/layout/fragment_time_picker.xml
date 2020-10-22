@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/time_picker_crime"
-        tools:context=".controller.fragment.TimePickerFragment">
+        tools:context=".view.fragment.TimePickerFragment">
 
 
     </TimePicker>

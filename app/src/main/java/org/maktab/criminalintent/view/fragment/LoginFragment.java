@@ -1,4 +1,4 @@
-package org.maktab.criminalintent.controller.fragment;
+package org.maktab.criminalintent.view.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,16 +10,17 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+
 import org.maktab.criminalintent.R;
-import org.maktab.criminalintent.controller.activity.CrimeListActivity;
-import org.maktab.criminalintent.controller.activity.SignUpActivity;
+import org.maktab.criminalintent.view.activity.CrimeListActivity;
+import org.maktab.criminalintent.view.activity.SignUpActivity;
 import org.maktab.criminalintent.databinding.FragmentLoginBinding;
 import org.maktab.criminalintent.model.User;
 import org.maktab.criminalintent.repository.UserDBRepository;
+import org.maktab.criminalintent.viewmodel.CrimeListViewModel;
+import org.maktab.criminalintent.viewmodel.LoginViewModel;
+
 import java.util.Objects;
 
 public class LoginFragment extends Fragment {
@@ -29,7 +30,8 @@ public class LoginFragment extends Fragment {
     private String username, password;
 
     private FragmentLoginBinding mLoginBinding;
-    private UserDBRepository mUserRepository;
+    private LoginViewModel mLoginViewModel;
+    /*private UserDBRepository mUserRepository;*/
 
     public LoginFragment() {
         // Required empty public constructor
@@ -45,7 +47,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserRepository = UserDBRepository.getInstance(getActivity());
+        mLoginViewModel = new LoginViewModel(getContext());
         if (savedInstanceState != null) {
             username = savedInstanceState.getString(BUNDLE_KEY_USERNAME);
             password = savedInstanceState.getString(BUNDLE_KEY_PASSWORD);
@@ -113,8 +115,10 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean validateInput() {
-        User user = mUserRepository.getUser(Objects.requireNonNull( mLoginBinding.usernameLogin.getText()).toString());
-        if ( mLoginBinding.usernameLogin.getText().toString().trim().isEmpty() && mLoginBinding.passwordLogin.getText().toString().trim().isEmpty()) {
+        User user = mLoginViewModel.getUser(Objects.requireNonNull(
+                mLoginBinding.usernameLogin.getText()).toString());
+        if ( mLoginBinding.usernameLogin.getText().toString().trim().isEmpty()
+                && mLoginBinding.passwordLogin.getText().toString().trim().isEmpty()) {
             mLoginBinding.usernameFormLogin.setErrorEnabled(true);
             mLoginBinding.usernameFormLogin.setError("Field cannot be empty!");
             mLoginBinding.passwordFormLogin.setErrorEnabled(true);
