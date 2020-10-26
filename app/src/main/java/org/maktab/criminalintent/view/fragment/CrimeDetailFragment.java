@@ -507,7 +507,7 @@ public class CrimeDetailFragment extends Fragment {
 //        Bitmap bitmap = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
 
         //this has a better memory management.
-        Bitmap bitmap = com.example.criminalintent.utils.PictureUtils.getScaledBitmap(mPhotoFile.getAbsolutePath(), getActivity());
+        Bitmap bitmap = org.maktab.criminalintent.utils.PictureUtils.getScaledBitmap(mPhotoFile.getAbsolutePath(), getActivity());
         mBinding.imgviewPhoto.setImageBitmap(bitmap);
     }
 
