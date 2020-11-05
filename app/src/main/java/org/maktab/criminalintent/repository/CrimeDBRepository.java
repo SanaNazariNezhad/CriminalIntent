@@ -13,7 +13,7 @@ import java.util.UUID;
 public class CrimeDBRepository implements IRepository {
 
     private static CrimeDBRepository sInstance;
-
+    
     private CrimeDatabaseDAO mCrimeDAO;
     private Context mContext;
 
