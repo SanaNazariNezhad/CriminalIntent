@@ -1,6 +1,9 @@
 package org.maktab.criminalintent.model;
 
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -119,6 +122,7 @@ public class Crime {
         mSuspectPhoneNumber = suspectPhoneNumber;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -134,6 +138,7 @@ public class Crime {
                 Objects.equals(mSuspectPhoneNumber, crime.mSuspectPhoneNumber);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public int hashCode() {
         return Objects.hash(primaryId, mId, mTitle, mDate, mSolved, mSuspect, mSuspectPhoneNumber, mCheck_Select);
